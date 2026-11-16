@@ -1,3 +1,5 @@
+Antes de escribir o modificar código, lee siempre los 5 archivos en /context (project-overview.md, ai-workflow-rules.md, ui-context.md, architecture-context.md, progress-tracker.md) y respeta estrictamente todas sus reglas.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
