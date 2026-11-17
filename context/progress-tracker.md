@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
-**Current Phase:** Phase 2 implementada en `feat/subscriptions-api` (pendiente de PR a `dev` y prueba real con Neon)
-**Active Branch:** `feat/subscriptions-api` (flujo: `feat/*` → `dev` → `main`)
+**Current Phase:** Phase 3 implementada en `feat/dashboard-ui` (pendiente de PR a `dev` y prueba real con Clerk + Neon)
+**Active Branch:** `feat/dashboard-ui` (flujo: `feat/*` → `dev` → `main`)
 **Last Updated:** 2026-11-17
 
 ## 1. Roadmap & Milestones
@@ -29,10 +29,10 @@
 
 ### Phase 3: Analytics Dashboard UI
 
-- [ ] Conectar UI con la API mediante `fetch` tipado.
-- [ ] Implementar KPI Cards (Gasto Mensual, Gasto Anual, Próximo Cobro).
-- [ ] Implementar sección de Próximos Vencimientos y listado filtrable/ordenable.
-- [ ] Implementar modal de creación/edición de suscripciones.
+- [x] Conectar UI con la API mediante `fetch` tipado.
+- [x] Implementar KPI Cards (Gasto Mensual, Gasto Anual, Próximo Cobro).
+- [x] Implementar sección de Próximos Vencimientos y listado filtrable/ordenable.
+- [x] Implementar modal de creación/edición de suscripciones.
 
 ### Phase 3.5: Landing pública (después de la Fase 3)
 
@@ -55,6 +55,7 @@
 
 ## 2. In Progress
 
+- Fase 3 en `feat/dashboard-ui`: abrir PR a `dev`; probar el dashboard en navegador con Clerk y Neon reales (no verificado visualmente aún).
 - Fase 2 en `feat/subscriptions-api`: abrir PR a `dev`; probar la API real contra Neon (requiere `DATABASE_URL` y migración aplicada).
 - Fase 1 (fusionada en `dev`): sigue pendiente probar el flujo real con claves de Clerk.
 
@@ -66,10 +67,12 @@
 - Fase 1: `@clerk/nextjs` 7 (+ `@clerk/ui` tema oscuro, `@clerk/localizations` es-ES), `proxy.ts` (401 JSON en `/api/*` excepto `/api/webhooks/*`; `auth.protect()` en `/dashboard`), `/sign-in`, `/sign-up`, layout dark con `<UserButton />`, `/dashboard` placeholder, landing mínima.
 - Fase 2: `lib/billing.ts` (`toMonthly`, `toYearly`, `addCycles`, `getNextBillingDate`; UTC, recorte a fin de mes), `lib/validations/subscription.ts` (Zod `strictObject`, `cancelUrl` solo http/https, rechaza `userId` en el body), `lib/subscriptions.ts` (DTO sin `userId`/`lastNotifiedFor`, helpers de respuesta), `app/api/subscriptions/route.ts` y `[id]/route.ts` (filtran siempre por `{ id, userId }`; acceso cruzado → 404).
 - Tests Fase 2: `billing.test.ts`, `subscription-validation.test.ts`, `subscriptions-api.test.ts` (401, 400, 404 cruzado, userId de sesión). Total: 48 tests.
+- Fase 3: `lib/dashboard.ts` (totales por divisa, próximos cobros, urgencia, filtros/orden, formato), `lib/api-client.ts` (fetch tipado), `components/dashboard/*` (KPIs, próximos vencimientos 7/15/30 días, listado filtrable/ordenable con pausar/editar/eliminar, modal crear/editar), `components/ui/dialog.tsx` (base-ui). Dependencia añadida: `swr`. Tests: `dashboard.test.ts` (9). Total: 57 tests.
 - Repo: `master` renombrada a `main`; creada `dev`; publicado en GitHub (`fergarperez/subtracker`). PR #1 (Fase 0), #2 (des-trackeo del cliente Prisma generado) y #3 (contexto de producto) fusionadas.
 
 ## 4. Known Issues / Technical Debt
 
+- Dashboard: el botón `+ Nueva suscripción` está en la cabecera de la página, no en el header del layout. Los KPIs se muestran por divisa (sin conversión entre divisas). Falta el desglose de gasto por categoría (overview). Sin tests de componentes (solo lógica pura).
 - **Decidido, pendiente de implementar (Fase 4):** los avisos de n8n son para todos los usuarios, por email. Se añadirá `email String?` a `UserSettings` (sincronizado desde Clerk). Detalle en `architecture-context.md` §3.
 - Falta aplicar la migración inicial en Neon (`npx prisma migrate dev`) con una `DATABASE_URL` real.
 - La CSP incluye dominios de Clerk de desarrollo (`*.clerk.accounts.dev`, `*.clerk.com`); al pasar a instancia de producción con dominio propio (`clerk.<tu-dominio>`) habrá que añadirlo (Fase 5).
