@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
-**Current Phase:** Phase 1 implementada en `feat/clerk-auth` (pendiente de verificar con claves reales de Clerk y PR a `dev`)
-**Active Branch:** `feat/clerk-auth` (flujo: `feat/*` → `dev` → `main`)
+**Current Phase:** Phase 2 implementada en `feat/subscriptions-api` (pendiente de PR a `dev` y prueba real con Neon)
+**Active Branch:** `feat/subscriptions-api` (flujo: `feat/*` → `dev` → `main`)
 **Last Updated:** 2026-11-17
 
 ## 1. Roadmap & Milestones
@@ -23,9 +23,9 @@
 
 ### Phase 2: Subscriptions API & Core Business Logic (+ Tests)
 
-- [ ] Implementar utilidades puras en `lib/billing.ts` (normalización mensual/anual y cálculo de próximo ciclo) + **tests unitarios completos**.
-- [ ] Crear esquemas Zod en `lib/validations/subscription.ts` (incluyendo validación segura de `cancelUrl`) + **tests de validación**.
-- [ ] Implementar Route Handlers (`GET/POST /api/subscriptions` y `PATCH/DELETE /api/subscriptions/[id]`) + **tests de seguridad (401/404 ante accesos cruzados)**.
+- [x] Implementar utilidades puras en `lib/billing.ts` (normalización mensual/anual y cálculo de próximo ciclo) + **tests unitarios completos**.
+- [x] Crear esquemas Zod en `lib/validations/subscription.ts` (incluyendo validación segura de `cancelUrl`) + **tests de validación**.
+- [x] Implementar Route Handlers (`GET/POST /api/subscriptions` y `PATCH/DELETE /api/subscriptions/[id]`) + **tests de seguridad (401/404 ante accesos cruzados)**.
 
 ### Phase 3: Analytics Dashboard UI
 
@@ -55,7 +55,8 @@
 
 ## 2. In Progress
 
-- Fase 1 en `feat/clerk-auth`: falta probar el flujo real (registro/login, 401 en `/api/*`, redirección) con claves de Clerk en `.env.local`, y abrir PR a `dev`.
+- Fase 2 en `feat/subscriptions-api`: abrir PR a `dev`; probar la API real contra Neon (requiere `DATABASE_URL` y migración aplicada).
+- Fase 1 (fusionada en `dev`): sigue pendiente probar el flujo real con claves de Clerk.
 
 ## 3. Completed
 
@@ -63,6 +64,8 @@
 - Fase 0: shadcn/ui (`components.json`, `components/ui/button.tsx`, `lib/utils.ts`), Prisma 7 + adapter Neon (`prisma/schema.prisma`, `prisma.config.ts`, `lib/prisma.ts`), Vitest (`vitest.config.mts`), cabeceras de seguridad + CSP básica.
 - Tests añadidos: `__tests__/utils.test.ts` (smoke test de `cn`), `__tests__/route-access.test.ts` (clasificación de rutas protegidas/API/webhooks).
 - Fase 1: `@clerk/nextjs` 7 (+ `@clerk/ui` tema oscuro, `@clerk/localizations` es-ES), `proxy.ts` (401 JSON en `/api/*` excepto `/api/webhooks/*`; `auth.protect()` en `/dashboard`), `/sign-in`, `/sign-up`, layout dark con `<UserButton />`, `/dashboard` placeholder, landing mínima.
+- Fase 2: `lib/billing.ts` (`toMonthly`, `toYearly`, `addCycles`, `getNextBillingDate`; UTC, recorte a fin de mes), `lib/validations/subscription.ts` (Zod `strictObject`, `cancelUrl` solo http/https, rechaza `userId` en el body), `lib/subscriptions.ts` (DTO sin `userId`/`lastNotifiedFor`, helpers de respuesta), `app/api/subscriptions/route.ts` y `[id]/route.ts` (filtran siempre por `{ id, userId }`; acceso cruzado → 404).
+- Tests Fase 2: `billing.test.ts`, `subscription-validation.test.ts`, `subscriptions-api.test.ts` (401, 400, 404 cruzado, userId de sesión). Total: 48 tests.
 - Repo: `master` renombrada a `main`; creada `dev`; publicado en GitHub (`fergarperez/subtracker`). PR #1 (Fase 0), #2 (des-trackeo del cliente Prisma generado) y #3 (contexto de producto) fusionadas.
 
 ## 4. Known Issues / Technical Debt

@@ -68,3 +68,16 @@ model UserSettings {
 - **Webhook:** `GET /api/webhooks/reminders` devuelve, por cada suscripción a avisar, el `email` del dueño junto a los datos del cobro. Los usuarios sin `email` se omiten.
 - **Privacidad:** el email es dato personal; solo se expone en los endpoints `/api/webhooks/*`, protegidos con `N8N_API_KEY`, y nunca en `/api/subscriptions`.
 - **Al implementarlo:** modificar `prisma/schema.prisma`, crear la migración y actualizar el bloque de arriba en el mismo commit.
+
+## 4. API de suscripciones (Fase 2)
+
+| Método | Ruta | Respuestas |
+| --- | --- | --- |
+| GET | `/api/subscriptions?status=active\|paused\|cancelled` | 200 lista (orden por `nextBillingDate` asc), 400, 401 |
+| POST | `/api/subscriptions` | 201, 400, 401 |
+| GET / PATCH / DELETE | `/api/subscriptions/[id]` | 200 / 204, 400, 401, 404 (inexistente o de otro usuario) |
+
+- `userId` siempre sale de `auth()`; los schemas Zod son `strictObject` (rechazan `userId`, `lastNotifiedFor` y campos desconocidos).
+- La respuesta (`toSubscriptionDto`) no incluye `userId` ni `lastNotifiedFor`; `price` es `number`, fechas en ISO 8601.
+- PATCH/DELETE usan `updateMany`/`deleteMany` con `where: { id, userId }`.
+- Sin nuevas variables de entorno ni cambios en Prisma. Dependencia añadida: `zod`.
