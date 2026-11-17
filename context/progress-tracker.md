@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
-**Current Phase:** Phase 3 implementada en `feat/dashboard-ui` (pendiente de PR a `dev` y prueba real con Clerk + Neon)
-**Active Branch:** `feat/dashboard-ui` (flujo: `feat/*` → `dev` → `main`)
+**Current Phase:** Phase 3.5 (landing) implementada en `feat/landing`, pendiente de PR a `dev`
+**Active Branch:** `feat/landing` (flujo: `feat/*` → `dev` → `main`)
 **Last Updated:** 2026-11-17
 
 ## 1. Roadmap & Milestones
@@ -36,7 +36,7 @@
 
 ### Phase 3.5: Landing pública (después de la Fase 3)
 
-- [ ] Diseñar y construir la landing en `/` en español, según `ui-context.md` §4, con capturas del dashboard real.
+- [x] Diseñar y construir la landing en `/` en español, según `ui-context.md` §4, con capturas del dashboard real.
 - [x] Redirigir `/` al dashboard cuando hay sesión activa (hecho en Phase 1).
 
 ### Phase 4: n8n Reminders API & Workflow Export
@@ -55,7 +55,7 @@
 
 ## 2. In Progress
 
-- Fase 3 en `feat/dashboard-ui`: abrir PR a `dev`; probar el dashboard en navegador con Clerk y Neon reales (no verificado visualmente aún).
+- Fase 3.5 en `feat/landing`: abrir PR a `dev` y revisar visualmente en navegador.
 - Fase 2 en `feat/subscriptions-api`: abrir PR a `dev`; probar la API real contra Neon (requiere `DATABASE_URL` y migración aplicada).
 - Fase 1 (fusionada en `dev`): sigue pendiente probar el flujo real con claves de Clerk.
 
@@ -68,6 +68,7 @@
 - Fase 2: `lib/billing.ts` (`toMonthly`, `toYearly`, `addCycles`, `getNextBillingDate`; UTC, recorte a fin de mes), `lib/validations/subscription.ts` (Zod `strictObject`, `cancelUrl` solo http/https, rechaza `userId` en el body), `lib/subscriptions.ts` (DTO sin `userId`/`lastNotifiedFor`, helpers de respuesta), `app/api/subscriptions/route.ts` y `[id]/route.ts` (filtran siempre por `{ id, userId }`; acceso cruzado → 404).
 - Tests Fase 2: `billing.test.ts`, `subscription-validation.test.ts`, `subscriptions-api.test.ts` (401, 400, 404 cruzado, userId de sesión). Total: 48 tests.
 - Fase 3: `lib/dashboard.ts` (totales por divisa, próximos cobros, urgencia, filtros/orden, formato), `lib/api-client.ts` (fetch tipado), `components/dashboard/*` (KPIs, próximos vencimientos 7/15/30 días, listado filtrable/ordenable con pausar/editar/eliminar, modal crear/editar), `components/ui/dialog.tsx` (base-ui). Dependencia añadida: `swr`. Tests: `dashboard.test.ts` (9). Total: 57 tests.
+- Fase 3.5: landing en `app/page.tsx` (navbar, hero, vista previa, 3 feature cards, footer) + `components/landing/product-preview.tsx`. La vista previa es una maqueta estática con datos de ejemplo, no capturas reales. Footer: "Hecho por Fernando" (ajustar el crédito si procede).
 - Repo: `master` renombrada a `main`; creada `dev`; publicado en GitHub (`fergarperez/subtracker`). PR #1 (Fase 0), #2 (des-trackeo del cliente Prisma generado) y #3 (contexto de producto) fusionadas.
 
 ## 4. Known Issues / Technical Debt
