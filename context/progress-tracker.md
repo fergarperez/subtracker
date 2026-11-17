@@ -33,6 +33,11 @@
 - [ ] Implementar sección de Próximos Vencimientos y listado filtrable/ordenable.
 - [ ] Implementar modal de creación/edición de suscripciones.
 
+### Phase 3.5: Landing pública (después de la Fase 3)
+
+- [ ] Diseñar y construir la landing en `/` en español, según `ui-context.md` §4, con capturas del dashboard real.
+- [ ] Redirigir `/` al dashboard cuando hay sesión activa.
+
 ### Phase 4: n8n Reminders API & Workflow Export
 
 - [ ] Implementar `GET /api/webhooks/reminders`, `POST /api/webhooks/reminders/ack` y `POST /api/webhooks/rollover` con verificación segura de `N8N_API_KEY` (`timingSafeEqual`).
@@ -59,6 +64,7 @@
 
 ## 4. Known Issues / Technical Debt
 
+- **Decisión pendiente (bloquea la Fase 4):** los avisos de n8n son para todos los usuarios, pero el modelo solo guarda el `userId` de Clerk. Hay que decidir cómo obtiene n8n el contacto de cada usuario (p. ej. email vía Clerk Backend API en el endpoint de reminders, o campo propio en `UserSettings`) y el canal (email vs. Telegram). Al decidirlo, actualizar `architecture-context.md`.
 - Falta aplicar la migración inicial en Neon (`npx prisma migrate dev`) con una `DATABASE_URL` real.
 - La CSP actual no incluye dominios de Clerk: hay que ampliarla en la Fase 1.
 - Rate limiting de webhooks pendiente (Fase 4).

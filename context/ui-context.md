@@ -23,7 +23,13 @@
 - **Fuente UI:** `Inter` o `Geist Sans`.
 - **Fuente Monospace (precios, fechas y contadores):** `JetBrains Mono` o `Geist Mono` con `tabular-nums` obligatorio en cifras y tablas.
 
-## 4. Component Library & Layout
+## 4. Idioma y landing
+
+- **Idioma:** toda la interfaz (app y landing) en **español**.
+- **Landing (`/`):** pública, mismo dark mode y paleta que la app. Dirigida a usuarios finales, tono de beneficio y sin jerga técnica. Secciones: (1) Hero con el problema y la promesa + CTA a `/sign-up`; (2) Cómo funciona en 3 pasos (añade tus suscripciones, mira tu gasto, recibe un aviso antes del cobro); (3) Vista previa del dashboard y de los avisos; (4) CTA final y pie de página. Se diseña tras la Fase 3, con capturas reales. Mensaje clave: gratis para siempre.
+- Hasta entonces, `/` redirige a `/sign-in` o al dashboard según haya sesión.
+
+## 5. Component Library & Layout
 
 - **Librería base:** `shadcn/ui` + `Lucide React`.
 - **Gestión de estado cliente / fetching:** `fetch` tipado hacia `/api/*` (con `TanStack Query` o `SWR` para caché, revalidación automática y estados de carga/error limpios).

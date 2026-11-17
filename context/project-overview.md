@@ -12,8 +12,8 @@ Aplicación web open-source y gratuita para el seguimiento centralizado de suscr
 
 ## 3. Target Audience
 
-- Usuario principal (control diario de gastos fijos personales).
-- Desarrolladores que busquen una alternativa open-source limpia para desplegar en Vercel y conectar con su propio n8n.
+- **Principal:** usuarios finales con el mismo problema que el autor: pagan varias suscripciones y pierden la pista de cuánto gastan y cuándo se las cobran. La app es **gratuita para siempre**, y tanto la app como la landing están **en español**.
+- **Secundaria:** desarrolladores que quieran clonar el proyecto (open-source). No es el foco de la comunicación ni de la landing.
 
 ## 4. Core Features (MVP)
 
@@ -25,12 +25,15 @@ Aplicación web open-source y gratuita para el seguimiento centralizado de suscr
   - Desglose de gasto por categoría.
   - Lista cronológica de "Próximos cobros" (siguientes 7, 15 y 30 días).
 - **Motor de Recordatorios vía n8n (`/api/webhooks/reminders`):**
-  - Endpoint seguro consultado diariamente por tu instancia privada de **n8n**.
+  - Endpoint seguro consultado diariamente por la instancia privada de **n8n** del autor.
+  - **Es una función para todos los usuarios de la app**, no solo para el autor: n8n avisa a cada usuario con suscripciones.
   - Devuelve las suscripciones activas próximas a vencer que aún no han sido notificadas en el ciclo actual, y expone un endpoint de confirmación (`ack`) y avance automático de fechas (`rollover`).
+  - Decisión pendiente: canal y dato de contacto por usuario (ver `progress-tracker.md`, sección 4).
+- **Landing pública (`/`):** explica a usuarios finales qué es la app y qué se van a encontrar (problema, cómo funciona, vista previa del dashboard y de los avisos, CTA a `/sign-up`). Lenguaje de beneficio, sin jerga técnica. Se implementa tras la Fase 3 (ver `progress-tracker.md`).
 
 ## 5. User Flow Principal
 
-1. **Acceso:** El usuario inicia sesión con Clerk y entra directamente a su dashboard privado.
+1. **Acceso:** El visitante llega a la landing (`/`), se registra o inicia sesión con Clerk y entra a su dashboard privado. Con sesión activa, `/` redirige al dashboard.
 2. **Alta de suscripción:** El usuario registra una suscripción desde el cliente web (`POST /api/subscriptions`).
 3. **Consulta:** El dashboard consume `GET /api/subscriptions` y renderiza el gasto mensual normalizado y los vencimientos inminentes.
-4. **Alerta automatizada (n8n):** Cada día a las 09:00, el workflow en tu VPS con n8n hace `GET /api/webhooks/reminders` a Vercel. Si detecta un cobro próximo, envía una notificación (Telegram/Email) y confirma el envío con `POST /api/webhooks/reminders/ack`.
+4. **Alerta automatizada (n8n):** Cada día a las 09:00, el workflow en tu VPS con n8n hace `GET /api/webhooks/reminders` a Vercel. Si detecta un cobro próximo, envía una notificación al usuario dueño de la suscripción (canal por decidir; email es el candidato) y confirma el envío con `POST /api/webhooks/reminders/ack`.
