@@ -1,15 +1,29 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import { BellRing, Calculator, ShieldCheck } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { ProductPreview } from "@/components/landing/product-preview";
 
-async function RedirectIfSignedIn() {
+async function NavActions() {
   const { userId } = await auth();
-  if (userId) redirect("/dashboard");
-  return null;
+  if (userId) {
+    return (
+      <Link href="/dashboard" className={buttonVariants()}>
+        Ir al dashboard
+      </Link>
+    );
+  }
+  return (
+    <>
+      <Link href="/sign-in" className={buttonVariants({ variant: "ghost" })}>
+        Iniciar sesión
+      </Link>
+      <Link href="/sign-up" className={buttonVariants()}>
+        Empezar gratis
+      </Link>
+    </>
+  );
 }
 
 const features = [
@@ -33,20 +47,14 @@ const features = [
 export default function Home() {
   return (
     <>
-      <Suspense fallback={null}>
-        <RedirectIfSignedIn />
-      </Suspense>
-
       <header className="border-b border-border">
         <nav className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4">
           <span className="font-semibold tracking-tight">SubTracker</span>
-          <div className="flex items-center gap-2">
-            <Link href="/sign-in" className={buttonVariants({ variant: "ghost" })}>
-              Iniciar sesión
-            </Link>
-            <Link href="/sign-up" className={buttonVariants()}>
-              Empezar gratis
-            </Link>
+          <div className="flex h-8 items-center gap-2">
+            {/* Cache Components: auth() lee la sesión en runtime, por eso va tras Suspense. */}
+            <Suspense fallback={null}>
+              <NavActions />
+            </Suspense>
           </div>
         </nav>
       </header>
