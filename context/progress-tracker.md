@@ -55,7 +55,7 @@ Decisión (2026-11-17): se sustituye n8n por un cron de Vercel que ejecuta el jo
 - [x] Nuevo sistema visual (paleta, tipografías, tokens) y `ui-context.md` actualizado.
 - [x] Dashboard: frase + línea de tiempo de próximos cobros, resumen con desglose por categoría, lista con avatares, estado vacío/onboarding, skeletons, confirmación de borrado en modal y avisos de acción. Botón `Nueva suscripción` en la cabecera de la página.
 - [x] Landing en dos columnas con maqueta que replica el nuevo dashboard.
-- [ ] Revisión visual en el navegador y de las pantallas de Clerk.
+- [x] Revisión visual en el navegador y de las pantallas de Clerk.
 
 ### Phase 5: Vercel Deployment & Production Hardening
 
