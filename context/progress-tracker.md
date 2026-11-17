@@ -41,6 +41,7 @@
 
 ### Phase 4: n8n Reminders API & Workflow Export
 
+- [ ] Añadir `email` a `UserSettings` (schema + migración), con `upsert` desde Clerk en la primera petición autenticada. El endpoint de reminders devuelve el email del dueño y omite usuarios sin email.
 - [ ] Implementar `GET /api/webhooks/reminders`, `POST /api/webhooks/reminders/ack` y `POST /api/webhooks/rollover` con verificación segura de `N8N_API_KEY` (`timingSafeEqual`).
 - [ ] Añadir tests de integración para los webhooks de n8n (token inválido, anti-duplicados con `lastNotifiedFor`, rollover de fechas).
 - [ ] Exportar flujo JSON de n8n en `/n8n/workflow.json` y documentarlo en `README.md`.
@@ -65,7 +66,7 @@
 
 ## 4. Known Issues / Technical Debt
 
-- **Decisión pendiente (bloquea la Fase 4):** los avisos de n8n son para todos los usuarios, pero el modelo solo guarda el `userId` de Clerk. Hay que decidir cómo obtiene n8n el contacto de cada usuario (p. ej. email vía Clerk Backend API en el endpoint de reminders, o campo propio en `UserSettings`) y el canal (email vs. Telegram). Al decidirlo, actualizar `architecture-context.md`.
+- **Decidido, pendiente de implementar (Fase 4):** los avisos de n8n son para todos los usuarios, por email. Se añadirá `email String?` a `UserSettings` (sincronizado desde Clerk). Detalle en `architecture-context.md` §3.
 - Falta aplicar la migración inicial en Neon (`npx prisma migrate dev`) con una `DATABASE_URL` real.
 - La CSP actual no incluye dominios de Clerk: hay que ampliarla en la Fase 1.
 - Rate limiting de webhooks pendiente (Fase 4).
