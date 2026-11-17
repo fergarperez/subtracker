@@ -24,7 +24,13 @@ export async function sendEmails(emails: OutgoingEmail[]): Promise<boolean[]> {
         ),
       });
       ok = res.ok;
-    } catch {
+      if (!ok) {
+        // Solo estado y mensaje de Resend (sin destinatarios) para poder diagnosticar en los logs.
+        const detail = await res.json().catch(() => null);
+        console.error("Resend batch failed", res.status, detail?.message ?? detail?.name ?? "sin detalle");
+      }
+    } catch (err) {
+      console.error("Resend batch request error", err instanceof Error ? err.message : "desconocido");
       ok = false;
     }
     results.push(...chunk.map(() => ok));
