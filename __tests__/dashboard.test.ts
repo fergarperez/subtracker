@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  categoryBreakdown,
   computeTotals,
+  hueFromText,
+  markerRows,
+  timelinePosition,
   filterByStatus,
   formatCountdown,
   getUrgency,
@@ -105,5 +109,46 @@ describe("filterByStatus / sortSubscriptions", () => {
     expect(sortSubscriptions(list, "date").map((s) => s.id)).toEqual(["b", "c", "a"]);
     expect(sortSubscriptions(list, "amount").map((s) => s.id)).toEqual(["b", "c", "a"]);
     expect(list.map((s) => s.id)).toEqual(["a", "b", "c"]);
+  });
+});
+
+describe("categoryBreakdown", () => {
+  it("agrupa por categoría en mensual, solo activas y de la divisa", () => {
+    const r = categoryBreakdown(
+      [
+        sub({ id: "1", category: "Vídeo", price: 10 }),
+        sub({ id: "2", category: "Vídeo", price: 120, billingCycle: "yearly" }),
+        sub({ id: "3", category: "Música", price: 30 }),
+        sub({ id: "4", category: "Música", price: 99, status: "paused" }),
+        sub({ id: "5", category: "Otra", price: 50, currency: "USD" }),
+      ],
+      "EUR",
+    );
+    expect(r.map((c) => c.category)).toEqual(["Música", "Vídeo"]);
+    expect(r[1].monthly).toBe(20);
+    expect(r[0].share).toBeCloseTo(0.6);
+  });
+  it("vacío sin gasto", () => {
+    expect(categoryBreakdown([], "EUR")).toEqual([]);
+  });
+});
+
+describe("timelinePosition / hueFromText", () => {
+  it("normaliza y acota a 0–1", () => {
+    expect(timelinePosition(inHours(24 * 15), now, 30)).toBeCloseTo(0.5);
+    expect(timelinePosition(inHours(-5), now, 30)).toBe(0);
+    expect(timelinePosition(inHours(24 * 90), now, 30)).toBe(1);
+  });
+  it("el tono es estable y está en rango", () => {
+    expect(hueFromText("Netflix")).toBe(hueFromText("netflix"));
+    expect(hueFromText("x")).toBeGreaterThanOrEqual(0);
+    expect(hueFromText("Spotify")).toBeLessThan(360);
+  });
+});
+
+describe("markerRows", () => {
+  it("alterna fila solo cuando los marcadores están muy juntos", () => {
+    expect(markerRows([0.1, 0.12, 0.14, 0.5])).toEqual([0, 1, 0, 0]);
+    expect(markerRows([])).toEqual([]);
   });
 });

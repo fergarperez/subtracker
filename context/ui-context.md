@@ -1,27 +1,23 @@
 # UI & Design System Context
 
-## 1. Aesthetic Direction
+## 1. Aesthetic Direction (rediseño 2026-11-17)
 
-- **Estilo:** Minimalismo funcional tipo dashboard financiero moderno (inspiración en Linear y Raycast). Alta claridad visual, tipografía tabular para cifras monetarias y cero elementos superfluos.
-- **Tema:** **Dark Mode por defecto** (con soporte opcional para Light Mode mediante variables CSS de Tailwind / shadcn).
+- **Estilo:** dashboard financiero cálido y claro, sin ruido. El elemento memorable es la **línea de tiempo de cobros** ("Netflix te cobra mañana" + marcadores sobre una escala de 7/15/30 días); el resto es discreto.
+- **Tema:** Dark Mode por defecto ("medianoche" azulada), sin modo claro por ahora.
+- **Movimiento:** solo los marcadores de la línea de tiempo entran escalonados al cargar; el resto son transiciones de respuesta a acciones. Respeta `prefers-reduced-motion`.
 
-## 2. Color Palette (Tailwind / CSS Variables)
+## 2. Color Palette (tokens en `app/globals.css`, clase `.dark`)
 
-- **Background Principal:** `#09090B` (`zinc-950`)
-- **Surface / Cards:** `#121215` o `#18181B` (`zinc-900`) con borde sutil `#27272A` (`zinc-800`, `1px solid`).
-- **Primary Accent (Acciones principales / CTAs):** `#10B981` (`emerald-500`) — hover en `#059669` (`emerald-600`).
-- **Text Primary:** `#FAFAFA` (`zinc-50`)
-- **Text Secondary / Muted:** `#A1A1AA` (`zinc-400`)
-- **Semantic Status Colors:**
-  - **Active / Safe:** `#10B981` (`emerald-500`)
-  - **Upcoming Renewal (< 7 días / Warning):** `#F59E0B` (`amber-500`)
-  - **Imminent Charge (< 48h / Urgent):** `#EF4444` (`red-500`)
-  - **Paused / Cancelled:** `#71717A` (`zinc-500`)
+- **Fondo:** `#0A0D1A` · **Superficie/cards:** `#121730` · **Elevado (`surface`):** `#1A2040` · **Borde:** `#262E52`
+- **Texto:** `#EEF0FA` · **Secundario:** `#8D96B8`
+- **Acento primario (CTAs, foco):** lila `#9B8CFF` (texto sobre él `#12093A`)
+- **Semánticos:** `safe` `#4ADE9A` (> 7 días), `warn` `#F5B544` (< 7 días), `urgent` `#FF6B81` (< 48 h); pausada/cancelada en `muted-foreground`.
+- Avatares y categorías usan un tono OKLCH estable derivado del nombre (`hueFromText`).
 
 ## 3. Typography & Data Display
 
-- **Fuente UI:** `Inter` o `Geist Sans`.
-- **Fuente Monospace (precios, fechas y contadores):** `JetBrains Mono` o `Geist Mono` con `tabular-nums` obligatorio en cifras y tablas.
+- **Títulos y cifras:** Bricolage Grotesque (`font-display`, aplicado a `h1–h3`). **Interfaz:** Figtree.
+- Cifras monetarias con clase `.tnum` (`tabular-nums`). Ya no se usa fuente monoespaciada.
 
 ## 4. Idioma y landing
 
@@ -30,27 +26,29 @@
 Landing Page (`/`)
 
 - **Estructura limpia (sin scroll infinito ni relleno comercial):**
-  1. **Navbar:** Logo a la izquierda; botones `Iniciar sesión` y `Empezar gratis` a la derecha.
-  2. **Hero Section:**
-     - Badge superior sutil: `Gratis para siempre`.
-     - Titular directo: _"Controla tus suscripciones antes de que te las cobren."_
-     - Subtítulo breve explicando el cálculo mensual/anual y los avisos por email antes de cada cobro.
-     - Dos CTAs: primario en verde (`emerald-500`) hacia `/sign-up` y secundario (`zinc-800`) que desplaza a la vista previa del producto.
-  3. **Product Preview:** Tarjeta con borde `zinc-800` mostrando una maqueta visual realista del dashboard en Dark Mode (KPIs + lista de próximos cobros con badges de urgencia).
-  4. **3 Feature Cards (Grid 3 columnas):**
-     - _Cálculo real mensual y anual_ (normalización de ciclos).
-     - _Avisos antes de cada cobro_ (te escribimos por email con antelación).
-     - _Gratis y privada_ (sin coste y tus datos son solo tuyos).
-  5. **Footer minimalista:** crédito del autor.
+  1. **Navbar (sticky):** `BrandLogo` a la izquierda; `Iniciar sesión` y `Empezar gratis` a la derecha (con sesión, `Ir al dashboard`).
+  2. **Hero en dos columnas (texto alineado a la izquierda):**
+     - Badge sutil: `Gratis para siempre`.
+     - Titular: _"Que ningún cobro te pille por sorpresa."_
+     - Subtítulo breve: apuntar suscripciones, gasto mensual/anual y email antes de cada cobro.
+     - Dos CTAs: primario lila (`primary`) hacia `/sign-up` y secundario que desplaza a la vista previa.
+     - A la derecha, `ProductPreview`: maqueta estática que replica la línea de tiempo del dashboard con datos de ejemplo.
+  3. **3 ventajas en columnas** (icono + título + texto, sin tarjetas): cuánto gastas de verdad, un aviso antes de cada cobro, gratis y solo tuya.
+  4. **Footer minimalista:** crédito del autor.
 - **Sin mención a open source, GitHub ni n8n:** la landing habla solo de producto y beneficio para el usuario final.
 
 ## 5. Component Library & Layout
 
-- **Librería base:** `shadcn/ui` + `Lucide React`.
-- **Gestión de estado cliente / fetching:** `fetch` tipado hacia `/api/*` (con `TanStack Query` o `SWR` para caché, revalidación automática y estados de carga/error limpios).
+- **Librería base:** `shadcn/ui` (con `@base-ui/react`) + `Lucide React`.
+- **Fetching:** `fetch` tipado hacia `/api/*` con `SWR` (caché, revalidación y estados de carga/error).
+- **Copy:** acciones con el mismo nombre en todo el flujo (botón `Eliminar` → aviso `Suscripción eliminada`). Los errores explican qué pasó y cómo seguir; los vacíos invitan a actuar.
 - **Layout:**
-  - **Header:** Logo + nombre de la app, botón primario `+ Nueva Suscripción`, y `<UserButton />` de Clerk.
-  - **Dashboard View (`max-w-6xl mx-auto`):**
-    1. **KPI Row (3 tarjetas):** Gasto Mensual Normalizado, Gasto Anual Proyectado, Próximo Cobro (importe + cuenta atrás).
-    2. **Próximos Vencimientos:** Tarjetas destacadas con badges de urgencia y acceso directo a `cancelUrl` (con `rel="noopener noreferrer"`).
-    3. **Listado de Suscripciones:** Filtrable por estado (`Activas`, `Pausadas`, `Todas`) y ordenable por fecha de cobro o importe. Responsive en móvil (vista tarjetas).
+  - **Header (sticky, `backdrop-blur`):** `BrandLogo` y `<UserButton />` de Clerk.
+  - **Dashboard (`max-w-6xl mx-auto`):**
+    1. **Cabecera de página:** título `Tus suscripciones` y botón primario `Nueva suscripción`.
+    2. **Fila principal** (`lg:grid-cols-[1.6fr_1fr]`):
+       - `Upcoming`: frase del próximo cobro + importe, selector 7/15/30 días, **línea de tiempo** con marcadores por urgencia y tarjetas de los cobros con `cancelUrl` (`rel="noopener noreferrer"`).
+       - `Summary`: gasto mensual y anual por divisa y barra de reparto por categoría (divisa principal).
+    3. **Listado:** filtro segmentado (`Activas`, `Pausadas`, `Todas`), orden por fecha o importe, filas con `Avatar`, `UrgencyBadge` e importe; acciones pausar/editar/eliminar visibles al pasar el ratón (siempre visibles en móvil).
+  - **Estados:** esqueletos al cargar, pantalla de bienvenida sin suscripciones, estado vacío por filtro, confirmación de borrado en modal y aviso breve tras cada acción.
+- **Componentes propios:** `components/brand-logo.tsx`, `components/dashboard/{dashboard,upcoming,summary,subscription-list,subscription-form,avatar,urgency-badge}.tsx`, `components/landing/product-preview.tsx`.

@@ -50,6 +50,13 @@ Decisión (2026-11-17): se sustituye n8n por un cron de Vercel que ejecuta el jo
 - [x] Añadir `vercel.json` con un cron diario (una sola ejecución al día en Hobby) y plantilla del email en español.
 - [x] Sustituir `N8N_API_KEY` por `CRON_SECRET`, `RESEND_API_KEY` y `EMAIL_FROM` en `.env.example`, y documentar el flujo en `README.md`.
 
+### Phase 4.5: Rediseño de la interfaz
+
+- [x] Nuevo sistema visual (paleta, tipografías, tokens) y `ui-context.md` actualizado.
+- [x] Dashboard: frase + línea de tiempo de próximos cobros, resumen con desglose por categoría, lista con avatares, estado vacío/onboarding, skeletons, confirmación de borrado en modal y avisos de acción. Botón `Nueva suscripción` en la cabecera de la página.
+- [x] Landing en dos columnas con maqueta que replica el nuevo dashboard.
+- [ ] Revisión visual en el navegador y de las pantallas de Clerk.
+
 ### Phase 5: Vercel Deployment & Production Hardening
 
 - [ ] Configurar variables de entorno en Vercel y ejecutar migraciones en NeonDB.
@@ -74,11 +81,12 @@ Decisión (2026-11-17): se sustituye n8n por un cron de Vercel que ejecuta el jo
 - Fase 3.5: landing en `app/page.tsx` (navbar, hero, vista previa, 3 feature cards, footer) + `components/landing/product-preview.tsx`. La vista previa es una maqueta estática con datos de ejemplo, no capturas reales. Footer: "Hecho por Fernando" (ajustar el crédito si procede).
 - Base de datos: `prisma/migrations/20261117014434_init` creada y aplicada en Neon; tablas `UserSettings` y `Subscription` verificadas con una consulta real.
 - Fase 4: `email` en `UserSettings` (migración `add_user_email` aplicada en Neon dev), `lib/user-settings.ts` (`syncUserEmail`, llamado en `GET /api/subscriptions`; consulta a Clerk si no hay email o tiene >24 h), `lib/reminders.ts`, `lib/cron-auth.ts` (`timingSafeEqual` sobre hash SHA-256), `lib/email.ts` (Resend batch vía `fetch`, sin dependencia nueva), `app/api/cron/reminders/route.ts`, `vercel.json` (cron `0 7 * * *`), `.env.example`. `proxy.ts` no cambia: usa `lib/route-access.ts`, que ahora excluye `/api/cron/*`. Tests: `reminders.test.ts`, `cron-reminders.test.ts`; `route-access.test.ts` actualizado. Total: 74 tests.
+- Rediseño: `lib/dashboard.ts` (+`categoryBreakdown`, `timelinePosition`, `markerRows`, `hueFromText`), componentes `brand-logo`, `avatar`, `summary`, `upcoming` (línea de tiempo). Se eliminó `kpi-cards`. Total: 79 tests.
 - Repo: `master` renombrada a `main`; creada `dev`; publicado en GitHub (`fergarperez/subtracker`). PR #1 (Fase 0), #2 (des-trackeo del cliente Prisma generado) y #3 (contexto de producto) fusionadas.
 
 ## 4. Known Issues / Technical Debt
 
-- Dashboard: el botón `+ Nueva suscripción` está en la cabecera de la página, no en el header del layout. Los KPIs se muestran por divisa (sin conversión entre divisas). Falta el desglose de gasto por categoría (overview). Sin tests de componentes (solo lógica pura).
+- Dashboard: los totales se muestran por divisa (sin conversión) y el desglose por categoría usa la divisa con más gasto. Sin tests de componentes (solo lógica pura).
 - Avisos (Fase 4): usuarios que no han abierto el dashboard desde la migración no tienen `email` y se omiten hasta que lo hagan. Si Resend falla, el lote no se marca y se reintenta al día siguiente. El envío de un lote es atómico (todo o nada).
 - Hobby de Vercel: cron como máximo diario, ±59 min de precisión y 300 s por ejecución. Pendiente confirmar los límites actuales de Resend (envíos/día y por segundo) antes de implementar; usar su envío por lotes si hace falta.
 - Migración inicial (`20261117014434_init`) aplicada en el Neon de desarrollo. En producción (Fase 5) se aplica con `npx prisma migrate deploy`, no `migrate dev`.

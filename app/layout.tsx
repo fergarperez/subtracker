@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Poppins } from "next/font/google";
+import { Bricolage_Grotesque, Figtree } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
 import { dark } from "@clerk/ui/themes";
 import { Suspense } from "react";
 import "./globals.css";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const figtree = Figtree({
+  variable: "--font-figtree",
   subsets: ["latin"],
 });
 
-const poppins = Poppins({
-  variable: "--font-poppins",
-  weight: ["400", "500", "600", "700"],
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
 });
 
@@ -25,12 +24,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`dark ${poppins.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="es" className={`dark ${figtree.variable} ${bricolage.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         {/* Cache Components: ClerkProvider lee la ruta en runtime, por eso va tras Suspense. */}
         <Suspense fallback={null}>
           <ClerkProvider
-            appearance={{ theme: dark, variables: { colorPrimary: "#10B981" } }}
+            appearance={{ theme: dark, variables: { colorPrimary: "#9B8CFF" } }}
             localization={esES}
           >
             {children}
