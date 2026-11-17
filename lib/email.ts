@@ -1,9 +1,11 @@
+import { Resend } from "resend";
+
 export type OutgoingEmail = { to: string; subject: string; html: string; text: string };
 
 const BATCH_SIZE = 100;
 
 /**
- * Envía emails con Resend (endpoint batch, máx. 100 por llamada).
+ * Envía emails con el SDK de Resend (batch, máx. 100 por llamada).
  * Devuelve, por cada email de entrada, si su lote se envió correctamente.
  */
 export async function sendEmails(emails: OutgoingEmail[]): Promise<boolean[]> {
@@ -11,21 +13,22 @@ export async function sendEmails(emails: OutgoingEmail[]): Promise<boolean[]> {
   const from = process.env.EMAIL_FROM;
   if (!apiKey || !from) throw new Error("RESEND_API_KEY y EMAIL_FROM son obligatorias");
 
+  const resend = new Resend(apiKey);
   const results: boolean[] = [];
   for (let i = 0; i < emails.length; i += BATCH_SIZE) {
     const chunk = emails.slice(i, i + BATCH_SIZE);
     let ok = false;
     try {
-      const res = await fetch("https://api.resend.com/emails/batch", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify(
-          chunk.map((e) => ({ from, to: [e.to], subject: e.subject, html: e.html, text: e.text })),
-        ),
-      });
-      ok = res.ok;
-    } catch {
-      ok = false;
+      const { error } = await resend.batch.send(
+        chunk.map((e) => ({ from, to: [e.to], subject: e.subject, html: e.html, text: e.text })),
+      );
+      ok = !error;
+      if (error) {
+        // Solo nombre y mensaje de Resend (sin destinatarios) para poder diagnosticar en los logs.
+        console.error("Resend batch failed", error.name, error.message);
+      }
+    } catch (err) {
+      console.error("Resend batch request error", err instanceof Error ? err.message : "desconocido");
     }
     results.push(...chunk.map(() => ok));
   }
