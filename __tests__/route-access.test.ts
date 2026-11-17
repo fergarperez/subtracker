@@ -30,3 +30,12 @@ describe("isPrivateApi", () => {
     expect(isPrivateApi("/api/cron-evil")).toBe(true);
   });
 });
+
+describe("páginas legales y landing", () => {
+  it("son públicas", () => {
+    for (const p of ["/", "/privacidad", "/aviso-legal"]) {
+      expect(isProtectedPage(p)).toBe(false);
+      expect(isPrivateApi(p)).toBe(false);
+    }
+  });
+});

@@ -5,6 +5,8 @@ import { BellRing, Calculator, ShieldCheck } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { buttonVariants } from "@/components/ui/button";
 import { ProductPreview } from "@/components/landing/product-preview";
+import { ReminderDemo } from "@/components/landing/reminder-demo";
+import { SiteFooter } from "@/components/landing/site-footer";
 
 async function NavActions() {
   const { userId } = await auth();
@@ -96,11 +98,11 @@ export default function Home() {
             </div>
           ))}
         </section>
+
+        <ReminderDemo />
       </main>
 
-      <footer className="border-t border-border py-6 text-center text-sm text-muted-foreground">
-        Hecho por Fernando
-      </footer>
+      <SiteFooter />
     </>
   );
 }

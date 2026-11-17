@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { planReminders, buildReminderEmail, type ReminderSubscription } from "@/lib/reminders";
+import {
+  planReminders,
+  buildReminderEmail,
+  buildDemoReminders,
+  type ReminderSubscription,
+} from "@/lib/reminders";
 
 const now = new Date("2026-11-17T07:00:00Z");
 const sub = (o: Partial<ReminderSubscription> = {}): ReminderSubscription => ({
@@ -85,5 +90,19 @@ describe("buildReminderEmail", () => {
   it("no incluye enlaces con protocolo no http(s)", () => {
     const e = buildReminderEmail([{ ...item, cancelUrl: "javascript:alert(1)" }]);
     expect(e.html).not.toContain("javascript:");
+  });
+});
+
+describe("buildDemoReminders", () => {
+  it("genera un aviso de ejemplo para mañana, sin enlaces ni datos reales", () => {
+    const items = buildDemoReminders(new Date("2026-11-17T15:30:00Z"));
+    expect(items).toHaveLength(1);
+    expect(items[0].billingDate.toISOString()).toBe("2026-11-18T00:00:00.000Z");
+    expect(items[0].cancelUrl).toBeNull();
+  });
+  it("es compatible con la plantilla real del email", () => {
+    const email = buildReminderEmail(buildDemoReminders(now));
+    expect(email.subject).toBe("Próximo cobro: Netflix");
+    expect(email.text).toContain("12,99");
   });
 });
