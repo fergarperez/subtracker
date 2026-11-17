@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
-**Current Phase:** Phase 0 completada y fusionada en `main`. Siguiente: Phase 1
-**Active Branch:** `chore/context-updates` (flujo: `feat/*` → `dev` → `main`)
+**Current Phase:** Phase 1 implementada en `feat/clerk-auth` (pendiente de verificar con claves reales de Clerk y PR a `dev`)
+**Active Branch:** `feat/clerk-auth` (flujo: `feat/*` → `dev` → `main`)
 **Last Updated:** 2026-11-17
 
 ## 1. Roadmap & Milestones
@@ -16,10 +16,10 @@
 
 ### Phase 1: Clerk Authentication & Protected Shell
 
-- [ ] Integrar `@clerk/nextjs` (`ClerkProvider`, pantallas `/sign-in` y `/sign-up`).
-- [ ] Configurar `proxy.ts` (en Next 16 `middleware` pasó a llamarse Proxy) para proteger rutas privadas y endpoints `/api/*`.
-- [ ] Construir layout base en Dark Mode con `<UserButton />`.
-- [ ] Implementar Landing Page pública en `/` con redirección automática a `/dashboard` si hay sesión activa de Clerk.
+- [x] Integrar `@clerk/nextjs` (`ClerkProvider`, pantallas `/sign-in` y `/sign-up`).
+- [x] Configurar `proxy.ts` (en Next 16 `middleware` pasó a llamarse Proxy) para proteger rutas privadas y endpoints `/api/*`.
+- [x] Construir layout base en Dark Mode con `<UserButton />`.
+- [x] Landing mínima en `/` con redirección automática a `/dashboard` si hay sesión activa (el diseño completo sigue en Phase 3.5).
 
 ### Phase 2: Subscriptions API & Core Business Logic (+ Tests)
 
@@ -37,7 +37,7 @@
 ### Phase 3.5: Landing pública (después de la Fase 3)
 
 - [ ] Diseñar y construir la landing en `/` en español, según `ui-context.md` §4, con capturas del dashboard real.
-- [ ] Redirigir `/` al dashboard cuando hay sesión activa.
+- [x] Redirigir `/` al dashboard cuando hay sesión activa (hecho en Phase 1).
 
 ### Phase 4: n8n Reminders API & Workflow Export
 
@@ -55,19 +55,21 @@
 
 ## 2. In Progress
 
-- Actualización de documentación de contexto (landing, audiencia, avisos) en `chore/context-updates`. Siguiente paso: Fase 1 (Clerk) en `feat/clerk-auth`.
+- Fase 1 en `feat/clerk-auth`: falta probar el flujo real (registro/login, 401 en `/api/*`, redirección) con claves de Clerk en `.env.local`, y abrir PR a `dev`.
 
 ## 3. Completed
 
 - Definición completa de los 5 archivos de contexto.
 - Fase 0: shadcn/ui (`components.json`, `components/ui/button.tsx`, `lib/utils.ts`), Prisma 7 + adapter Neon (`prisma/schema.prisma`, `prisma.config.ts`, `lib/prisma.ts`), Vitest (`vitest.config.mts`), cabeceras de seguridad + CSP básica.
-- Tests añadidos: `__tests__/utils.test.ts` (smoke test de `cn`).
+- Tests añadidos: `__tests__/utils.test.ts` (smoke test de `cn`), `__tests__/route-access.test.ts` (clasificación de rutas protegidas/API/webhooks).
+- Fase 1: `@clerk/nextjs` 7 (+ `@clerk/ui` tema oscuro, `@clerk/localizations` es-ES), `proxy.ts` (401 JSON en `/api/*` excepto `/api/webhooks/*`; `auth.protect()` en `/dashboard`), `/sign-in`, `/sign-up`, layout dark con `<UserButton />`, `/dashboard` placeholder, landing mínima.
 - Repo: `master` renombrada a `main`; creada `dev`; publicado en GitHub (`fergarperez/subtracker`). PR #1 (Fase 0), #2 (des-trackeo del cliente Prisma generado) y #3 (contexto de producto) fusionadas.
 
 ## 4. Known Issues / Technical Debt
 
 - **Decidido, pendiente de implementar (Fase 4):** los avisos de n8n son para todos los usuarios, por email. Se añadirá `email String?` a `UserSettings` (sincronizado desde Clerk). Detalle en `architecture-context.md` §3.
 - Falta aplicar la migración inicial en Neon (`npx prisma migrate dev`) con una `DATABASE_URL` real.
-- La CSP actual no incluye dominios de Clerk: hay que ampliarla en la Fase 1.
+- La CSP incluye dominios de Clerk de desarrollo (`*.clerk.accounts.dev`, `*.clerk.com`); al pasar a instancia de producción con dominio propio (`clerk.<tu-dominio>`) habrá que añadirlo (Fase 5).
+- `ClerkProvider` va dentro de `<Suspense>` en `app/layout.tsx` por `cacheComponents`.
 - Rate limiting de webhooks pendiente (Fase 4).
 - `next.config.ts` trae opciones experimentales (`cacheComponents`, `partialPrefetching`, `agentFeedback`) heredadas del scaffold; revisar si se mantienen.
