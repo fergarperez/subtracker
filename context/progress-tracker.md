@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
 **Current Phase:** Phase 4 implementada (Vercel Cron + Resend), pendiente de PR a `dev`; fases 0 a 3.5 fusionadas en `dev`
-**Active Branch:** `feat/reminders-cron` (flujo: `feat/*` → `dev` → `main`)
+**Active Branch:** `feat/landing-demo-legal` (flujo: `feat/*` → `dev` → `main`)
 **Last Updated:** 2026-11-17
 
 ## 1. Roadmap & Milestones
@@ -57,6 +57,16 @@ Decisión (2026-11-17): se sustituye n8n por un cron de Vercel que ejecuta el jo
 - [x] Landing en dos columnas con maqueta que replica el nuevo dashboard.
 - [x] Revisión visual en el navegador y de las pantallas de Clerk.
 
+### Phase 4.6: Demo de aviso en la landing + footer + páginas legales
+
+Decisiones (2026-11-17): la demo es un **email de ejemplo en pantalla** (sin enviar nada ni pedir datos); el footer lleva marca, navegación y enlaces legales.
+
+- [x] Extraer de `lib/reminders.ts` el contenido del email a una función pura reutilizable (`buildReminderEmail` ya devuelve asunto/HTML/texto) y usarla con datos de ejemplo fijos en la demo, para que landing y email real no diverjan. + tests.
+- [x] Componente cliente `ReminderDemo` en la landing: botón `Ver un aviso de ejemplo` → bandeja ficticia donde llega el email (animación de entrada, `prefers-reduced-motion` respetado), con el texto real del aviso y botón `Repetir`. Sin llamadas a la API ni a Clerk.
+- [x] Footer nuevo: `BrandLogo` + frase, columnas de navegación (`Cómo funciona`, `Empezar gratis`, `Iniciar sesión`) y legales (`Privacidad`, `Aviso legal y cookies`), crédito del autor. Responsive.
+- [x] Páginas `/privacidad` y `/aviso-legal` (estáticas, en español): qué datos se guardan (email y suscripciones), para qué, proveedores (Clerk, Neon, Resend, Vercel), cómo borrarlos. Excluirlas de la protección en `proxy.ts` si procede y actualizar `route-access`.
+- [x] Actualizar `ui-context.md` (§4 landing y footer).
+
 ### Phase 5: Vercel Deployment & Production Hardening
 
 - [ ] Configurar variables de entorno en Vercel y ejecutar migraciones en NeonDB.
@@ -81,6 +91,7 @@ Decisión (2026-11-17): se sustituye n8n por un cron de Vercel que ejecuta el jo
 - Fase 3.5: landing en `app/page.tsx` (navbar, hero, vista previa, 3 feature cards, footer) + `components/landing/product-preview.tsx`. La vista previa es una maqueta estática con datos de ejemplo, no capturas reales. Footer: "Hecho por Fernando" (ajustar el crédito si procede).
 - Base de datos: `prisma/migrations/20261117014434_init` creada y aplicada en Neon; tablas `UserSettings` y `Subscription` verificadas con una consulta real.
 - Fase 4: `email` en `UserSettings` (migración `add_user_email` aplicada en Neon dev), `lib/user-settings.ts` (`syncUserEmail`, llamado en `GET /api/subscriptions`; consulta a Clerk si no hay email o tiene >24 h), `lib/reminders.ts`, `lib/cron-auth.ts` (`timingSafeEqual` sobre hash SHA-256), `lib/email.ts` (Resend batch vía `fetch`, sin dependencia nueva), `app/api/cron/reminders/route.ts`, `vercel.json` (cron `0 7 * * *`), `.env.example`. `proxy.ts` no cambia: usa `lib/route-access.ts`, que ahora excluye `/api/cron/*`. Tests: `reminders.test.ts`, `cron-reminders.test.ts`; `route-access.test.ts` actualizado. Total: 74 tests.
+- Fase 4.6: `buildDemoReminders` (`lib/reminders.ts`), `components/landing/{reminder-demo,site-footer}.tsx`, páginas `/privacidad` y `/aviso-legal` en `app/(legal)`, `lib/legal.ts`. `proxy.ts` no cambia (son públicas). Tests: demo en `reminders.test.ts` y rutas públicas en `route-access.test.ts`. Total: 82 tests. Pendiente: revisión visual en navegador y fijar `NEXT_PUBLIC_CONTACT_EMAIL`.
 - Rediseño: `lib/dashboard.ts` (+`categoryBreakdown`, `timelinePosition`, `markerRows`, `hueFromText`), componentes `brand-logo`, `avatar`, `summary`, `upcoming` (línea de tiempo). Se eliminó `kpi-cards`. Total: 79 tests.
 - Repo: `master` renombrada a `main`; creada `dev`; publicado en GitHub (`fergarperez/subtracker`). PR #1 (Fase 0), #2 (des-trackeo del cliente Prisma generado) y #3 (contexto de producto) fusionadas.
 

@@ -34,7 +34,9 @@ Landing Page (`/`)
      - Dos CTAs: primario lila (`primary`) hacia `/sign-up` y secundario que desplaza a la vista previa.
      - A la derecha, `ProductPreview`: maqueta estática que replica la línea de tiempo del dashboard con datos de ejemplo.
   3. **3 ventajas en columnas** (icono + título + texto, sin tarjetas): cuánto gastas de verdad, un aviso antes de cada cobro, gratis y solo tuya.
-  4. **Footer minimalista:** crédito del autor.
+  4. **Demo `Así te avisamos`** (`ReminderDemo`, componente cliente): botón `Ver un aviso de ejemplo` → bandeja ficticia donde aparece el email real (`buildReminderEmail` + `buildDemoReminders`, sin llamadas a API ni Clerk), con botón `Repetir`. Animación `mail-in` desactivada con `prefers-reduced-motion`.
+  5. **Footer** (`SiteFooter`, también en las páginas legales): `BrandLogo` + frase, columnas `Producto` (`Cómo funciona`, `Empezar gratis`, `Iniciar sesión`) y `Legal` (`Privacidad`, `Aviso legal y cookies`), y crédito del autor.
+- **Páginas legales** (grupo `app/(legal)`, estáticas y públicas): `/privacidad` y `/aviso-legal`. El correo de contacto sale de `NEXT_PUBLIC_CONTACT_EMAIL` (opcional).
 - **Sin mención a open source, GitHub ni n8n:** la landing habla solo de producto y beneficio para el usuario final.
 
 ## 5. Component Library & Layout

@@ -121,3 +121,21 @@ export function buildReminderEmail(items: DueReminder[]): {
 
   return { subject, html, text };
 }
+
+/**
+ * Datos de ejemplo para la demo de la landing: mismo formato que los avisos reales,
+ * así la demo usa `buildReminderEmail` y no puede divergir del email enviado.
+ */
+export function buildDemoReminders(now: Date): DueReminder[] {
+  const day = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  return [
+    {
+      id: "demo-netflix",
+      name: "Netflix",
+      price: 12.99,
+      currency: "EUR",
+      billingDate: new Date(day.getTime() + DAY_MS),
+      cancelUrl: null,
+    },
+  ];
+}
