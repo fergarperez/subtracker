@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
-**Current Phase:** Phase 4 implementada (Vercel Cron + Resend), pendiente de PR a `dev`; fases 0 a 3.5 fusionadas en `dev`
-**Active Branch:** `feat/landing-demo-legal` (flujo: `feat/*` → `dev` → `main`)
+**Current Phase:** Phase 5 en curso (despliegue en Vercel); fases 0 a 4.6 fusionadas en `dev`
+**Active Branch:** `chore/vercel-deploy` (flujo: `feat/*` → `dev` → `main`)
 **Last Updated:** 2026-11-17
 
 ## 1. Roadmap & Milestones
@@ -69,14 +69,15 @@ Decisiones (2026-11-17): la demo es un **email de ejemplo en pantalla** (sin env
 
 ### Phase 5: Vercel Deployment & Production Hardening
 
-- [ ] Configurar variables de entorno en Vercel y ejecutar migraciones en NeonDB.
+- [x] Runbook de despliegue en `README.md` (migrate deploy, Clerk live, Resend, variables, validación E2E). Verificado en local: 82 tests, lint y `next build` OK.
+- [ ] Configurar variables de entorno en Vercel y ejecutar migraciones en NeonDB (manual, ver README).
 - [ ] Configurar `CRON_SECRET`, `RESEND_API_KEY` y `EMAIL_FROM` en Vercel, verificar el dominio del remitente en Resend y validar un aviso real de extremo a extremo.
 
 ---
 
 ## 2. In Progress
 
-- Fase 4 implementada en `feat/reminders-cron`; falta PR → `dev`. Siguiente: Fase 5.
+- Fase 5: runbook listo en `chore/vercel-deploy`; faltan los pasos manuales en Neon/Clerk/Resend/Vercel (cuentas del autor) y añadir el dominio de Clerk live a la CSP.
 - Pendiente de comprobar con servicios reales: probar la API contra Neon, el flujo de Clerk con claves reales y revisar visualmente la landing en el navegador.
 
 ## 3. Completed
@@ -90,7 +91,7 @@ Decisiones (2026-11-17): la demo es un **email de ejemplo en pantalla** (sin env
 - Fase 3: `lib/dashboard.ts` (totales por divisa, próximos cobros, urgencia, filtros/orden, formato), `lib/api-client.ts` (fetch tipado), `components/dashboard/*` (KPIs, próximos vencimientos 7/15/30 días, listado filtrable/ordenable con pausar/editar/eliminar, modal crear/editar), `components/ui/dialog.tsx` (base-ui). Dependencia añadida: `swr`. Tests: `dashboard.test.ts` (9). Total: 57 tests.
 - Fase 3.5: landing en `app/page.tsx` (navbar, hero, vista previa, 3 feature cards, footer) + `components/landing/product-preview.tsx`. La vista previa es una maqueta estática con datos de ejemplo, no capturas reales. Footer: "Hecho por Fernando" (ajustar el crédito si procede).
 - Base de datos: `prisma/migrations/20261117014434_init` creada y aplicada en Neon; tablas `UserSettings` y `Subscription` verificadas con una consulta real.
-- Fase 4: `email` en `UserSettings` (migración `add_user_email` aplicada en Neon dev), `lib/user-settings.ts` (`syncUserEmail`, llamado en `GET /api/subscriptions`; consulta a Clerk si no hay email o tiene >24 h), `lib/reminders.ts`, `lib/cron-auth.ts` (`timingSafeEqual` sobre hash SHA-256), `lib/email.ts` (Resend batch vía `fetch`, sin dependencia nueva), `app/api/cron/reminders/route.ts`, `vercel.json` (cron `0 7 * * *`), `.env.example`. `proxy.ts` no cambia: usa `lib/route-access.ts`, que ahora excluye `/api/cron/*`. Tests: `reminders.test.ts`, `cron-reminders.test.ts`; `route-access.test.ts` actualizado. Total: 74 tests.
+- Fase 4: `email` en `UserSettings` (migración `add_user_email` aplicada en Neon dev), `lib/user-settings.ts` (`syncUserEmail`, llamado en `GET /api/subscriptions`; consulta a Clerk si no hay email o tiene >24 h), `lib/reminders.ts`, `lib/cron-auth.ts` (`timingSafeEqual` sobre hash SHA-256), `lib/email.ts` (Resend batch vía `fetch`, sin dependencia nueva), `app/api/cron/reminders/route.ts`, `vercel.json` (cron `0 8 * * *`), `.env.example`. `proxy.ts` no cambia: usa `lib/route-access.ts`, que ahora excluye `/api/cron/*`. Tests: `reminders.test.ts`, `cron-reminders.test.ts`; `route-access.test.ts` actualizado. Total: 74 tests.
 - Fase 4.6: `buildDemoReminders` (`lib/reminders.ts`), `components/landing/{reminder-demo,site-footer}.tsx`, páginas `/privacidad` y `/aviso-legal` en `app/(legal)`, `lib/legal.ts`. `proxy.ts` no cambia (son públicas). Tests: demo en `reminders.test.ts` y rutas públicas en `route-access.test.ts`. Total: 82 tests. Pendiente: revisión visual en navegador y fijar `NEXT_PUBLIC_CONTACT_EMAIL`.
 - Rediseño: `lib/dashboard.ts` (+`categoryBreakdown`, `timelinePosition`, `markerRows`, `hueFromText`), componentes `brand-logo`, `avatar`, `summary`, `upcoming` (línea de tiempo). Se eliminó `kpi-cards`. Total: 79 tests.
 - Repo: `master` renombrada a `main`; creada `dev`; publicado en GitHub (`fergarperez/subtracker`). PR #1 (Fase 0), #2 (des-trackeo del cliente Prisma generado) y #3 (contexto de producto) fusionadas.
