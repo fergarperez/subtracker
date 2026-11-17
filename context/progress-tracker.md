@@ -57,6 +57,16 @@ Decisión (2026-11-17): se sustituye n8n por un cron de Vercel que ejecuta el jo
 - [x] Landing en dos columnas con maqueta que replica el nuevo dashboard.
 - [x] Revisión visual en el navegador y de las pantallas de Clerk.
 
+### Phase 4.6: Demo de aviso en la landing + footer + páginas legales
+
+Decisiones (2026-11-17): la demo es un **email de ejemplo en pantalla** (sin enviar nada ni pedir datos); el footer lleva marca, navegación y enlaces legales.
+
+- [ ] Extraer de `lib/reminders.ts` el contenido del email a una función pura reutilizable (`buildReminderEmail` ya devuelve asunto/HTML/texto) y usarla con datos de ejemplo fijos en la demo, para que landing y email real no diverjan. + tests.
+- [ ] Componente cliente `ReminderDemo` en la landing: botón `Ver un aviso de ejemplo` → bandeja ficticia donde llega el email (animación de entrada, `prefers-reduced-motion` respetado), con el texto real del aviso y botón `Repetir`. Sin llamadas a la API ni a Clerk.
+- [ ] Footer nuevo: `BrandLogo` + frase, columnas de navegación (`Cómo funciona`, `Empezar gratis`, `Iniciar sesión`) y legales (`Privacidad`, `Aviso legal y cookies`), crédito del autor. Responsive.
+- [ ] Páginas `/privacidad` y `/aviso-legal` (estáticas, en español): qué datos se guardan (email y suscripciones), para qué, proveedores (Clerk, Neon, Resend, Vercel), cómo borrarlos. Excluirlas de la protección en `proxy.ts` si procede y actualizar `route-access`.
+- [ ] Actualizar `ui-context.md` (§4 landing y footer).
+
 ### Phase 5: Vercel Deployment & Production Hardening
 
 - [ ] Configurar variables de entorno en Vercel y ejecutar migraciones en NeonDB.
