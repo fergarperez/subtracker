@@ -26,8 +26,22 @@
 ## 4. Idioma y landing
 
 - **Idioma:** toda la interfaz (app y landing) en **español**.
-- **Landing (`/`):** pública, mismo dark mode y paleta que la app. Dirigida a usuarios finales, tono de beneficio y sin jerga técnica. Secciones: (1) Hero con el problema y la promesa + CTA a `/sign-up`; (2) Cómo funciona en 3 pasos (añade tus suscripciones, mira tu gasto, recibe un aviso antes del cobro); (3) Vista previa del dashboard y de los avisos; (4) CTA final y pie de página. Se diseña tras la Fase 3, con capturas reales. Mensaje clave: gratis para siempre.
-- Hasta entonces, `/` redirige a `/sign-in` o al dashboard según haya sesión.
+
+Landing Page (`/`)
+
+- **Estructura limpia (sin scroll infinito ni relleno comercial):**
+  1. **Navbar:** Logo a la izquierda; enlace a GitHub + botones `Iniciar sesión` y `Empezar gratis` a la derecha.
+  2. **Hero Section:**
+     - Badge superior sutil: `Open Source · Free Forever · n8n Ready`.
+     - Titular directo: _"Controla tus suscripciones antes de que te las cobren."_
+     - Subtítulo breve explicando el cálculo mensual/anual y los avisos automáticos vía webhook/n8n.
+     - Dos CTAs: primario en verde (`emerald-500`) hacia `/sign-up` y secundario (`zinc-800`) hacia GitHub.
+  3. **Product Preview:** Tarjeta con borde `zinc-800` mostrando una maqueta visual realista del dashboard en Dark Mode (KPIs + lista de próximos cobros con badges de urgencia).
+  4. **3 Feature Cards (Grid 3 columnas):**
+     - _Cálculo real mensual y anual_ (normalización de ciclos).
+     - _Avisos automatizados con n8n_ (webhook seguro + Telegram/Email).
+     - _Open Source & Privacidad_ (despliega en Vercel + NeonDB o haz fork).
+  5. **Footer minimalista:** Licencia MIT, enlace al repo y crédito del autor.
 
 ## 5. Component Library & Layout
 

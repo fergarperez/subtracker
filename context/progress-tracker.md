@@ -19,6 +19,7 @@
 - [ ] Integrar `@clerk/nextjs` (`ClerkProvider`, pantallas `/sign-in` y `/sign-up`).
 - [ ] Configurar `proxy.ts` (en Next 16 `middleware` pasó a llamarse Proxy) para proteger rutas privadas y endpoints `/api/*`.
 - [ ] Construir layout base en Dark Mode con `<UserButton />`.
+- [ ] Implementar Landing Page pública en `/` con redirección automática a `/dashboard` si hay sesión activa de Clerk.
 
 ### Phase 2: Subscriptions API & Core Business Logic (+ Tests)
 

@@ -29,7 +29,9 @@ Aplicación web open-source y gratuita para el seguimiento centralizado de suscr
   - **Es una función para todos los usuarios de la app**, no solo para el autor: n8n avisa a cada usuario con suscripciones.
   - Devuelve las suscripciones activas próximas a vencer que aún no han sido notificadas en el ciclo actual, y expone un endpoint de confirmación (`ack`) y avance automático de fechas (`rollover`).
   - Decisión pendiente: canal y dato de contacto por usuario (ver `progress-tracker.md`, sección 4).
-- **Landing pública (`/`):** explica a usuarios finales qué es la app y qué se van a encontrar (problema, cómo funciona, vista previa del dashboard y de los avisos, CTA a `/sign-up`). Lenguaje de beneficio, sin jerga técnica. Se implementa tras la Fase 3 (ver `progress-tracker.md`).
+- **Landing Page Pública (`/`):**
+  - **Redirección automática:** Si el usuario ya tiene sesión iniciada en Clerk, `/` redirige inmediatamente a `/dashboard`.
+  - **Visitantes no autenticados:** Página de presentación minimalista tipo micro-SaaS open-source con propuesta de valor clara, vista previa visual (mockup estático o interactivo con datos de ejemplo) del dashboard, explicación de la integración con n8n, y CTAs directos hacia `/sign-up` ("Usar gratis") y el repositorio de GitHub ("Self-Host").
 
 ## 5. User Flow Principal
 
