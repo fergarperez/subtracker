@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
-**Current Phase:** Phase 0 — Setup completado, pendiente de merge a `dev`
-**Active Branch:** `chore/initial-setup` (ramas `main` y `dev` creadas)
+**Current Phase:** Phase 0 completada y fusionada en `main`. Siguiente: Phase 1
+**Active Branch:** `chore/context-updates` (flujo: `feat/*` → `dev` → `main`)
 **Last Updated:** 2026-11-17
 
 ## 1. Roadmap & Milestones
@@ -54,14 +54,14 @@
 
 ## 2. In Progress
 
-- Rama `chore/initial-setup` lista para merge a `dev`. Siguiente paso: Fase 1 (Clerk) en `feat/clerk-auth`.
+- Actualización de documentación de contexto (landing, audiencia, avisos) en `chore/context-updates`. Siguiente paso: Fase 1 (Clerk) en `feat/clerk-auth`.
 
 ## 3. Completed
 
 - Definición completa de los 5 archivos de contexto.
 - Fase 0: shadcn/ui (`components.json`, `components/ui/button.tsx`, `lib/utils.ts`), Prisma 7 + adapter Neon (`prisma/schema.prisma`, `prisma.config.ts`, `lib/prisma.ts`), Vitest (`vitest.config.mts`), cabeceras de seguridad + CSP básica.
 - Tests añadidos: `__tests__/utils.test.ts` (smoke test de `cn`).
-- Repo: `master` renombrada a `main`; creada `dev`.
+- Repo: `master` renombrada a `main`; creada `dev`; publicado en GitHub (`fergarperez/subtracker`). PR #1 (Fase 0), #2 (des-trackeo del cliente Prisma generado) y #3 (contexto de producto) fusionadas.
 
 ## 4. Known Issues / Technical Debt
 

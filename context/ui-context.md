@@ -30,18 +30,19 @@
 Landing Page (`/`)
 
 - **Estructura limpia (sin scroll infinito ni relleno comercial):**
-  1. **Navbar:** Logo a la izquierda; enlace a GitHub + botones `Iniciar sesión` y `Empezar gratis` a la derecha.
+  1. **Navbar:** Logo a la izquierda; botones `Iniciar sesión` y `Empezar gratis` a la derecha.
   2. **Hero Section:**
-     - Badge superior sutil: `Open Source · Free Forever · n8n Ready`.
+     - Badge superior sutil: `Gratis para siempre`.
      - Titular directo: _"Controla tus suscripciones antes de que te las cobren."_
-     - Subtítulo breve explicando el cálculo mensual/anual y los avisos automáticos vía webhook/n8n.
-     - Dos CTAs: primario en verde (`emerald-500`) hacia `/sign-up` y secundario (`zinc-800`) hacia GitHub.
+     - Subtítulo breve explicando el cálculo mensual/anual y los avisos por email antes de cada cobro.
+     - Dos CTAs: primario en verde (`emerald-500`) hacia `/sign-up` y secundario (`zinc-800`) que desplaza a la vista previa del producto.
   3. **Product Preview:** Tarjeta con borde `zinc-800` mostrando una maqueta visual realista del dashboard en Dark Mode (KPIs + lista de próximos cobros con badges de urgencia).
   4. **3 Feature Cards (Grid 3 columnas):**
      - _Cálculo real mensual y anual_ (normalización de ciclos).
-     - _Avisos automatizados con n8n_ (webhook seguro + Telegram/Email).
-     - _Open Source & Privacidad_ (despliega en Vercel + NeonDB o haz fork).
-  5. **Footer minimalista:** Licencia MIT, enlace al repo y crédito del autor.
+     - _Avisos antes de cada cobro_ (te escribimos por email con antelación).
+     - _Gratis y privada_ (sin coste y tus datos son solo tuyos).
+  5. **Footer minimalista:** crédito del autor.
+- **Sin mención a open source, GitHub ni n8n:** la landing habla solo de producto y beneficio para el usuario final.
 
 ## 5. Component Library & Layout
 

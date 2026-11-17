@@ -31,7 +31,7 @@ Aplicación web open-source y gratuita para el seguimiento centralizado de suscr
   - Decisión pendiente: canal y dato de contacto por usuario (ver `progress-tracker.md`, sección 4).
 - **Landing Page Pública (`/`):**
   - **Redirección automática:** Si el usuario ya tiene sesión iniciada en Clerk, `/` redirige inmediatamente a `/dashboard`.
-  - **Visitantes no autenticados:** Página de presentación minimalista tipo micro-SaaS open-source con propuesta de valor clara, vista previa visual (mockup estático o interactivo con datos de ejemplo) del dashboard, explicación de la integración con n8n, y CTAs directos hacia `/sign-up` ("Usar gratis") y el repositorio de GitHub ("Self-Host").
+  - **Visitantes no autenticados:** Página de presentación minimalista con propuesta de valor clara, vista previa visual (mockup estático o interactivo con datos de ejemplo) del dashboard y CTAs hacia `/sign-up` ("Empezar gratis"). Orientada a usuarios finales: no menciona open source, GitHub ni n8n (detalle en `ui-context.md` §4).
 
 ## 5. User Flow Principal
 
