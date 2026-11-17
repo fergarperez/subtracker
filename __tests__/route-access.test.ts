@@ -18,15 +18,15 @@ describe("isPrivateApi", () => {
     expect(isPrivateApi("/api/subscriptions")).toBe(true);
     expect(isPrivateApi("/api/subscriptions/abc")).toBe(true);
   });
-  it("excluye /api/webhooks/* (usan N8N_API_KEY)", () => {
-    expect(isPrivateApi("/api/webhooks/reminders")).toBe(false);
-    expect(isPrivateApi("/api/webhooks/reminders/ack")).toBe(false);
+  it("excluye /api/cron/* (usan CRON_SECRET)", () => {
+    expect(isPrivateApi("/api/cron/reminders")).toBe(false);
+    expect(isPrivateApi("/api/cron/reminders/ack")).toBe(false);
   });
   it("no afecta a rutas que no son API", () => {
     expect(isPrivateApi("/")).toBe(false);
     expect(isPrivateApi("/apix")).toBe(false);
   });
-  it("no se deja engañar por prefijos parecidos a webhooks", () => {
-    expect(isPrivateApi("/api/webhooks-evil")).toBe(true);
+  it("no se deja engañar por prefijos parecidos a cron", () => {
+    expect(isPrivateApi("/api/cron-evil")).toBe(true);
   });
 });

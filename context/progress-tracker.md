@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
-**Current Phase:** Phase 4 redefinida (Vercel Cron + Resend en lugar de n8n); fases 0 a 3.5 fusionadas en `dev`
-**Active Branch:** `chore/reminders-cron` (flujo: `feat/*` → `dev` → `main`)
+**Current Phase:** Phase 4 implementada (Vercel Cron + Resend), pendiente de PR a `dev`; fases 0 a 3.5 fusionadas en `dev`
+**Active Branch:** `feat/reminders-cron` (flujo: `feat/*` → `dev` → `main`)
 **Last Updated:** 2026-11-17
 
 ## 1. Roadmap & Milestones
@@ -43,12 +43,12 @@
 
 Decisión (2026-11-17): se sustituye n8n por un cron de Vercel que ejecuta el job en la propia app. Motivos: sin dependencia de un VPS propio, lógica versionada y testeable con Vitest, menos endpoints y menos superficie de ataque, y el email del usuario no sale del servidor.
 
-- [ ] Añadir `email` a `UserSettings` (schema + migración; quitar de paso la línea `url = env(...)` del bloque `generator`, que Prisma 7 ignora), con `upsert` desde Clerk en la primera petición autenticada.
-- [ ] Implementar `lib/reminders.ts` (selección de suscripciones a avisar, anti-duplicados con `lastNotifiedFor`, rollover con `getNextBillingDate`, agrupación por usuario) + **tests unitarios completos**.
-- [ ] Implementar `GET /api/cron/reminders` con verificación de `CRON_SECRET` (`timingSafeEqual`), envío por Resend y respuesta solo con contadores. Tests: 401 sin/mal token, no duplica en una segunda ejecución, omite usuarios sin email.
-- [ ] Actualizar `proxy.ts` y `__tests__/route-access.test.ts`: excluir `/api/cron/*` del 401 de Clerk en lugar de `/api/webhooks/*`.
-- [ ] Añadir `vercel.json` con un cron diario (una sola ejecución al día en Hobby) y plantilla del email en español.
-- [ ] Sustituir `N8N_API_KEY` por `CRON_SECRET`, `RESEND_API_KEY` y `EMAIL_FROM` en `.env.example`, y documentar el flujo en `README.md`.
+- [x] Añadir `email` a `UserSettings` (schema + migración; quitar de paso la línea `url = env(...)` del bloque `generator`, que Prisma 7 ignora), con `upsert` desde Clerk en la primera petición autenticada.
+- [x] Implementar `lib/reminders.ts` (selección de suscripciones a avisar, anti-duplicados con `lastNotifiedFor`, rollover con `getNextBillingDate`, agrupación por usuario) + **tests unitarios completos**.
+- [x] Implementar `GET /api/cron/reminders` con verificación de `CRON_SECRET` (`timingSafeEqual`), envío por Resend y respuesta solo con contadores. Tests: 401 sin/mal token, no duplica en una segunda ejecución, omite usuarios sin email.
+- [x] Actualizar `proxy.ts` y `__tests__/route-access.test.ts`: excluir `/api/cron/*` del 401 de Clerk en lugar de `/api/webhooks/*`.
+- [x] Añadir `vercel.json` con un cron diario (una sola ejecución al día en Hobby) y plantilla del email en español.
+- [x] Sustituir `N8N_API_KEY` por `CRON_SECRET`, `RESEND_API_KEY` y `EMAIL_FROM` en `.env.example`, y documentar el flujo en `README.md`.
 
 ### Phase 5: Vercel Deployment & Production Hardening
 
@@ -59,7 +59,7 @@ Decisión (2026-11-17): se sustituye n8n por un cron de Vercel que ejecuta el jo
 
 ## 2. In Progress
 
-- Documentación de la Fase 4 (Vercel Cron + Resend) en `chore/reminders-cron`. Siguiente: `feat/reminders-cron`.
+- Fase 4 implementada en `feat/reminders-cron`; falta PR → `dev`. Siguiente: Fase 5.
 - Pendiente de comprobar con servicios reales: probar la API contra Neon, el flujo de Clerk con claves reales y revisar visualmente la landing en el navegador.
 
 ## 3. Completed
@@ -73,12 +73,13 @@ Decisión (2026-11-17): se sustituye n8n por un cron de Vercel que ejecuta el jo
 - Fase 3: `lib/dashboard.ts` (totales por divisa, próximos cobros, urgencia, filtros/orden, formato), `lib/api-client.ts` (fetch tipado), `components/dashboard/*` (KPIs, próximos vencimientos 7/15/30 días, listado filtrable/ordenable con pausar/editar/eliminar, modal crear/editar), `components/ui/dialog.tsx` (base-ui). Dependencia añadida: `swr`. Tests: `dashboard.test.ts` (9). Total: 57 tests.
 - Fase 3.5: landing en `app/page.tsx` (navbar, hero, vista previa, 3 feature cards, footer) + `components/landing/product-preview.tsx`. La vista previa es una maqueta estática con datos de ejemplo, no capturas reales. Footer: "Hecho por Fernando" (ajustar el crédito si procede).
 - Base de datos: `prisma/migrations/20261117014434_init` creada y aplicada en Neon; tablas `UserSettings` y `Subscription` verificadas con una consulta real.
+- Fase 4: `email` en `UserSettings` (migración `add_user_email` aplicada en Neon dev), `lib/user-settings.ts` (`syncUserEmail`, llamado en `GET /api/subscriptions`; consulta a Clerk si no hay email o tiene >24 h), `lib/reminders.ts`, `lib/cron-auth.ts` (`timingSafeEqual` sobre hash SHA-256), `lib/email.ts` (Resend batch vía `fetch`, sin dependencia nueva), `app/api/cron/reminders/route.ts`, `vercel.json` (cron `0 7 * * *`), `.env.example`. `proxy.ts` no cambia: usa `lib/route-access.ts`, que ahora excluye `/api/cron/*`. Tests: `reminders.test.ts`, `cron-reminders.test.ts`; `route-access.test.ts` actualizado. Total: 74 tests.
 - Repo: `master` renombrada a `main`; creada `dev`; publicado en GitHub (`fergarperez/subtracker`). PR #1 (Fase 0), #2 (des-trackeo del cliente Prisma generado) y #3 (contexto de producto) fusionadas.
 
 ## 4. Known Issues / Technical Debt
 
 - Dashboard: el botón `+ Nueva suscripción` está en la cabecera de la página, no en el header del layout. Los KPIs se muestran por divisa (sin conversión entre divisas). Falta el desglose de gasto por categoría (overview). Sin tests de componentes (solo lógica pura).
-- **Decidido, pendiente de implementar (Fase 4):** los avisos son para todos los usuarios, por email, con Vercel Cron + Resend. Se añadirá `email String?` a `UserSettings` (sincronizado desde Clerk). Detalle en `architecture-context.md` §3.
+- Avisos (Fase 4): usuarios que no han abierto el dashboard desde la migración no tienen `email` y se omiten hasta que lo hagan. Si Resend falla, el lote no se marca y se reintenta al día siguiente. El envío de un lote es atómico (todo o nada).
 - Hobby de Vercel: cron como máximo diario, ±59 min de precisión y 300 s por ejecución. Pendiente confirmar los límites actuales de Resend (envíos/día y por segundo) antes de implementar; usar su envío por lotes si hace falta.
 - Migración inicial (`20261117014434_init`) aplicada en el Neon de desarrollo. En producción (Fase 5) se aplica con `npx prisma migrate deploy`, no `migrate dev`.
 - La CSP incluye dominios de Clerk de desarrollo (`*.clerk.accounts.dev`, `*.clerk.com`); al pasar a instancia de producción con dominio propio (`clerk.<tu-dominio>`) habrá que añadirlo (Fase 5).

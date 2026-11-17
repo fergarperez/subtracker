@@ -8,6 +8,6 @@ export function isProtectedPage(pathname: string): boolean {
 /** Endpoints privados que requieren sesión de Clerk (401 si no hay). */
 export function isPrivateApi(pathname: string): boolean {
   if (pathname !== "/api" && !pathname.startsWith("/api/")) return false;
-  // /api/webhooks/* se protege con N8N_API_KEY (Bearer), no con Clerk.
-  return !(pathname === "/api/webhooks" || pathname.startsWith("/api/webhooks/"));
+  // /api/cron/* se protege con CRON_SECRET (Bearer), no con Clerk.
+  return !(pathname === "/api/cron" || pathname.startsWith("/api/cron/"));
 }

@@ -3,7 +3,6 @@
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
-  url      = env("DATABASE_URL")
 }
 
 datasource db {
@@ -14,6 +13,7 @@ model UserSettings {
   userId              String   @id // Clerk userId
   defaultCurrency     String   @default("EUR")
   defaultReminderDays Int      @default(3)
+  email               String? // Email de aviso (sincronizado desde Clerk)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
