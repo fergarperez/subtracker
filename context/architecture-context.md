@@ -52,3 +52,19 @@ model Subscription {
   @@index([status, nextBillingDate])
 }
 ```
+
+### Cambio planificado (Fase 4): email de aviso
+
+Los avisos de n8n son para **todos los usuarios**, por **email**. Decisión: el email se guarda en `UserSettings` (no se consulta a Clerk en cada llamada).
+
+```prisma
+model UserSettings {
+  // ...campos actuales...
+  email String? // Email de aviso del usuario; lo usa /api/webhooks/reminders
+}
+```
+
+- **Origen y sincronización:** se rellena desde Clerk (`currentUser()`) al hacer `upsert` de `UserSettings` en la primera petición autenticada, y se actualiza si cambia. Nunca se acepta un `email` enviado en el body para otro usuario.
+- **Webhook:** `GET /api/webhooks/reminders` devuelve, por cada suscripción a avisar, el `email` del dueño junto a los datos del cobro. Los usuarios sin `email` se omiten.
+- **Privacidad:** el email es dato personal; solo se expone en los endpoints `/api/webhooks/*`, protegidos con `N8N_API_KEY`, y nunca en `/api/subscriptions`.
+- **Al implementarlo:** modificar `prisma/schema.prisma`, crear la migración y actualizar el bloque de arriba en el mismo commit.
