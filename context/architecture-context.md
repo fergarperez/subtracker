@@ -75,7 +75,7 @@ model UserSettings {
 - **Demo de la landing:** `buildDemoReminders(now)` en `lib/reminders.ts` alimenta `buildReminderEmail`, así la demo y el email real comparten plantilla.
 - **Variables de entorno nuevas:** `CRON_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`. Se retira `N8N_API_KEY`. Opcional: `NEXT_PUBLIC_CONTACT_EMAIL` (contacto en las páginas legales).
 - **Privacidad:** el email es dato personal; solo se usa dentro del job en el servidor. Ninguna respuesta HTTP lo devuelve, ni `/api/subscriptions` ni el propio endpoint de cron (responde solo con contadores).
-- **Implementación:** `lib/user-settings.ts` (sync del email), `lib/reminders.ts`, `lib/cron-auth.ts`, `lib/email.ts` (Resend `POST /emails/batch` por `fetch`), `app/api/cron/reminders/route.ts` y `vercel.json` (`0 7 * * *`). Orden del job: rollover → envío → marcar `lastNotifiedFor` solo si el envío fue correcto.
+- **Implementación:** `lib/user-settings.ts` (sync del email), `lib/reminders.ts`, `lib/cron-auth.ts`, `lib/email.ts` (Resend `POST /emails/batch` por `fetch`), `app/api/cron/reminders/route.ts` y `vercel.json` (`0 8 * * *`). Orden del job: rollover → envío → marcar `lastNotifiedFor` solo si el envío fue correcto.
 
 ## 4. API de suscripciones (Fase 2)
 
