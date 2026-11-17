@@ -1,14 +1,14 @@
 # Project Progress Tracker
 
-**Current Phase:** Phase 3.5 (landing) en `feat/landing-public-for-all`, pendiente de PR a `dev`
-**Active Branch:** `feat/landing-public-for-all` (flujo: `feat/*` → `dev` → `main`)
+**Current Phase:** Phase 4 redefinida (Vercel Cron + Resend en lugar de n8n); fases 0 a 3.5 fusionadas en `dev`
+**Active Branch:** `chore/reminders-cron` (flujo: `feat/*` → `dev` → `main`)
 **Last Updated:** 2026-11-17
 
 ## 1. Roadmap & Milestones
 
 ### Phase 0: Setup, Security Base & Testing Harness (Current)
 
-- [x] Definición de arquitectura (Next.js API + Clerk + NeonDB + Vercel + n8n).
+- [x] Definición de arquitectura (Next.js API + Clerk + NeonDB + Vercel; avisos con Vercel Cron + Resend, antes n8n).
 - [x] Inicializar proyecto Next.js (App Router, TypeScript, Tailwind, shadcn/ui). Se mantiene `app/` en la raíz (sin `src/`).
 - [x] Configurar Prisma con NeonDB y crear esquema inicial (`UserSettings`, `Subscription`). Migración inicial aplicada en Neon (dev).
 - [x] Configurar **Vitest** para testing unitario y de endpoints API (`npm run test`).
@@ -39,25 +39,28 @@
 - [x] Diseñar y construir la landing en `/` en español, según `ui-context.md` §4, con capturas del dashboard real.
 - [x] ~~Redirigir `/` al dashboard con sesión activa~~ (Phase 1) — **revertido**: la landing es visible con sesión y el navbar muestra `Ir al dashboard`.
 
-### Phase 4: n8n Reminders API & Workflow Export
+### Phase 4: Reminders con Vercel Cron + Resend
 
-- [ ] Añadir `email` a `UserSettings` (schema + migración), con `upsert` desde Clerk en la primera petición autenticada. El endpoint de reminders devuelve el email del dueño y omite usuarios sin email.
-- [ ] Implementar `GET /api/webhooks/reminders`, `POST /api/webhooks/reminders/ack` y `POST /api/webhooks/rollover` con verificación segura de `N8N_API_KEY` (`timingSafeEqual`).
-- [ ] Añadir tests de integración para los webhooks de n8n (token inválido, anti-duplicados con `lastNotifiedFor`, rollover de fechas).
-- [ ] Exportar flujo JSON de n8n en `/n8n/workflow.json` y documentarlo en `README.md`.
+Decisión (2026-11-17): se sustituye n8n por un cron de Vercel que ejecuta el job en la propia app. Motivos: sin dependencia de un VPS propio, lógica versionada y testeable con Vitest, menos endpoints y menos superficie de ataque, y el email del usuario no sale del servidor.
+
+- [ ] Añadir `email` a `UserSettings` (schema + migración; quitar de paso la línea `url = env(...)` del bloque `generator`, que Prisma 7 ignora), con `upsert` desde Clerk en la primera petición autenticada.
+- [ ] Implementar `lib/reminders.ts` (selección de suscripciones a avisar, anti-duplicados con `lastNotifiedFor`, rollover con `getNextBillingDate`, agrupación por usuario) + **tests unitarios completos**.
+- [ ] Implementar `GET /api/cron/reminders` con verificación de `CRON_SECRET` (`timingSafeEqual`), envío por Resend y respuesta solo con contadores. Tests: 401 sin/mal token, no duplica en una segunda ejecución, omite usuarios sin email.
+- [ ] Actualizar `proxy.ts` y `__tests__/route-access.test.ts`: excluir `/api/cron/*` del 401 de Clerk en lugar de `/api/webhooks/*`.
+- [ ] Añadir `vercel.json` con un cron diario (una sola ejecución al día en Hobby) y plantilla del email en español.
+- [ ] Sustituir `N8N_API_KEY` por `CRON_SECRET`, `RESEND_API_KEY` y `EMAIL_FROM` en `.env.example`, y documentar el flujo en `README.md`.
 
 ### Phase 5: Vercel Deployment & Production Hardening
 
 - [ ] Configurar variables de entorno en Vercel y ejecutar migraciones en NeonDB.
-- [ ] Conectar instancia privada de n8n en VPS con los endpoints de producción y validar alertas reales.
+- [ ] Configurar `CRON_SECRET`, `RESEND_API_KEY` y `EMAIL_FROM` en Vercel, verificar el dominio del remitente en Resend y validar un aviso real de extremo a extremo.
 
 ---
 
 ## 2. In Progress
 
-- Fase 3.5 en `feat/landing`: abrir PR a `dev` y revisar visualmente en navegador.
-- Fase 2 en `feat/subscriptions-api`: abrir PR a `dev`; probar la API real contra Neon (requiere `DATABASE_URL` y migración aplicada).
-- Fase 1 (fusionada en `dev`): sigue pendiente probar el flujo real con claves de Clerk.
+- Documentación de la Fase 4 (Vercel Cron + Resend) en `chore/reminders-cron`. Siguiente: `feat/reminders-cron`.
+- Pendiente de comprobar con servicios reales: probar la API contra Neon, el flujo de Clerk con claves reales y revisar visualmente la landing en el navegador.
 
 ## 3. Completed
 
@@ -75,9 +78,9 @@
 ## 4. Known Issues / Technical Debt
 
 - Dashboard: el botón `+ Nueva suscripción` está en la cabecera de la página, no en el header del layout. Los KPIs se muestran por divisa (sin conversión entre divisas). Falta el desglose de gasto por categoría (overview). Sin tests de componentes (solo lógica pura).
-- **Decidido, pendiente de implementar (Fase 4):** los avisos de n8n son para todos los usuarios, por email. Se añadirá `email String?` a `UserSettings` (sincronizado desde Clerk). Detalle en `architecture-context.md` §3.
+- **Decidido, pendiente de implementar (Fase 4):** los avisos son para todos los usuarios, por email, con Vercel Cron + Resend. Se añadirá `email String?` a `UserSettings` (sincronizado desde Clerk). Detalle en `architecture-context.md` §3.
+- Hobby de Vercel: cron como máximo diario, ±59 min de precisión y 300 s por ejecución. Pendiente confirmar los límites actuales de Resend (envíos/día y por segundo) antes de implementar; usar su envío por lotes si hace falta.
 - Migración inicial (`20261117014434_init`) aplicada en el Neon de desarrollo. En producción (Fase 5) se aplica con `npx prisma migrate deploy`, no `migrate dev`.
 - La CSP incluye dominios de Clerk de desarrollo (`*.clerk.accounts.dev`, `*.clerk.com`); al pasar a instancia de producción con dominio propio (`clerk.<tu-dominio>`) habrá que añadirlo (Fase 5).
 - `ClerkProvider` va dentro de `<Suspense>` en `app/layout.tsx` por `cacheComponents`.
-- Rate limiting de webhooks pendiente (Fase 4).
 - `next.config.ts` trae opciones experimentales (`cacheComponents`, `partialPrefetching`, `agentFeedback`) heredadas del scaffold; revisar si se mantienen.

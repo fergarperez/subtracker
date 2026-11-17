@@ -2,7 +2,7 @@
 
 ## 1. Vision & Scope
 
-Aplicación web open-source y gratuita para el seguimiento centralizado de suscripciones recurrentes. Diseñada originalmente como herramienta personal con arquitectura multiusuario aislada (tipo micro-SaaS), desplegada en la nube (Vercel + NeonDB) y conectada a una instancia privada de n8n para automatizar los avisos de renovación.
+Aplicación web open-source y gratuita para el seguimiento centralizado de suscripciones recurrentes. Diseñada originalmente como herramienta personal con arquitectura multiusuario aislada (tipo micro-SaaS), desplegada en la nube (Vercel + NeonDB) con avisos de renovación por email enviados por un cron de Vercel.
 
 ## 2. Core Goals
 
@@ -24,11 +24,13 @@ Aplicación web open-source y gratuita para el seguimiento centralizado de suscr
   - Gasto mensual total normalizado y proyección anual.
   - Desglose de gasto por categoría.
   - Lista cronológica de "Próximos cobros" (siguientes 7, 15 y 30 días).
-- **Motor de Recordatorios vía n8n (`/api/webhooks/reminders`):**
-  - Endpoint seguro consultado diariamente por la instancia privada de **n8n** del autor.
-  - **Es una función para todos los usuarios de la app**, no solo para el autor: n8n avisa a cada usuario con suscripciones.
-  - Devuelve las suscripciones activas próximas a vencer que aún no han sido notificadas en el ciclo actual, y expone un endpoint de confirmación (`ack`) y avance automático de fechas (`rollover`).
-  - Canal: **email**. El email de cada usuario se guarda en `UserSettings` (ver `architecture-context.md` §3).
+- **Motor de Recordatorios (Vercel Cron + Resend, `/api/cron/reminders`):**
+  - Un **Vercel Cron diario** llama a `GET /api/cron/reminders`, protegido con `CRON_SECRET`. No depende de ningún servidor propio ni de n8n.
+  - **Es una función para todos los usuarios de la app**: avisa a cada usuario con suscripciones.
+  - En una sola pasada el job (1) selecciona las suscripciones activas cuyo cobro está dentro de su ventana de aviso y aún no notificadas en el ciclo (`lastNotifiedFor`), (2) envía un email por Resend al dueño, (3) marca `lastNotifiedFor` y (4) avanza `nextBillingDate` de las que ya cobraron (rollover).
+  - Canal: **email**, en español. El email de cada usuario se guarda en `UserSettings` (ver `architecture-context.md` §3) y nunca sale del servidor.
+  - Límites del plan Hobby de Vercel: mínimo una ejecución al día, precisión de ±59 min sobre la hora programada y 300 s por ejecución. No se promete una hora exacta de aviso.
+  - n8n queda descartado del núcleo. Solo se reconsiderará para canales extra (p. ej. Telegram) o automatizaciones futuras.
 - **Landing Page Pública (`/`):**
   - **Sin redirección:** la landing es visible también con sesión iniciada; en ese caso el navbar muestra `Ir al dashboard` en lugar de los botones de acceso.
   - **Contenido:** Página de presentación minimalista con propuesta de valor clara, vista previa visual (mockup estático o interactivo con datos de ejemplo) del dashboard y CTAs hacia `/sign-up` ("Empezar gratis"). Orientada a usuarios finales: no menciona open source, GitHub ni n8n (detalle en `ui-context.md` §4).
@@ -38,4 +40,4 @@ Aplicación web open-source y gratuita para el seguimiento centralizado de suscr
 1. **Acceso:** El visitante llega a la landing (`/`), se registra o inicia sesión con Clerk y entra a su dashboard privado. Con sesión activa, la landing sigue visible y ofrece un acceso directo al dashboard.
 2. **Alta de suscripción:** El usuario registra una suscripción desde el cliente web (`POST /api/subscriptions`).
 3. **Consulta:** El dashboard consume `GET /api/subscriptions` y renderiza el gasto mensual normalizado y los vencimientos inminentes.
-4. **Alerta automatizada (n8n):** Cada día a las 09:00, el workflow en tu VPS con n8n hace `GET /api/webhooks/reminders` a Vercel. Si detecta un cobro próximo, envía un email al usuario dueño de la suscripción y confirma el envío con `POST /api/webhooks/reminders/ack`.
+4. **Alerta automatizada (Vercel Cron):** Cada día, a primera hora de la mañana (UTC, con margen de hasta 59 min), Vercel llama a `GET /api/cron/reminders`. Si una suscripción está dentro de su ventana de aviso, la app envía un email al dueño con Resend, marca la suscripción como notificada y avanza las fechas de los cobros ya pasados.

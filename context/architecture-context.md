@@ -16,7 +16,9 @@
 
 - **Web App & API:** Desplegada en **Vercel** (Preview Deployments automáticos en ramas `feat/*` y `dev`; Production en `main`).
 - **Database:** **NeonDB** (con branch de `dev` y branch de `main` aislados si se desea).
-- **Automation Engine:** **n8n** autoalojado en VPS privado, comunicándose vía HTTPS con los endpoints `/api/webhooks/*` de Vercel.
+- **Scheduled jobs:** **Vercel Cron** (`vercel.json`) ejecuta cada día `GET /api/cron/reminders`. Vercel envía `Authorization: Bearer $CRON_SECRET`.
+- **Email:** **Resend** (envío transaccional, por lotes si hace falta). Remitente configurable con `EMAIL_FROM`.
+- **Límites Hobby a respetar:** una ejecución diaria como máximo (una expresión más frecuente hace fallar el deploy), precisión de ±59 min y 300 s por ejecución. El job debe ser idempotente y poder reanudarse si se corta.
 
 ## 3. Data Model (Prisma Schema)
 
@@ -55,18 +57,22 @@ model Subscription {
 
 ### Cambio planificado (Fase 4): email de aviso
 
-Los avisos de n8n son para **todos los usuarios**, por **email**. Decisión: el email se guarda en `UserSettings` (no se consulta a Clerk en cada llamada).
+Los avisos son para **todos los usuarios**, por **email**, enviados por el cron de Vercel con Resend. Decisión: el email se guarda en `UserSettings` (no se consulta a Clerk en cada ejecución).
 
 ```prisma
 model UserSettings {
   // ...campos actuales...
-  email String? // Email de aviso del usuario; lo usa /api/webhooks/reminders
+  email String? // Email de aviso del usuario; lo usa el job /api/cron/reminders
 }
 ```
 
 - **Origen y sincronización:** se rellena desde Clerk (`currentUser()`) al hacer `upsert` de `UserSettings` en la primera petición autenticada, y se actualiza si cambia. Nunca se acepta un `email` enviado en el body para otro usuario.
-- **Webhook:** `GET /api/webhooks/reminders` devuelve, por cada suscripción a avisar, el `email` del dueño junto a los datos del cobro. Los usuarios sin `email` se omiten.
-- **Privacidad:** el email es dato personal; solo se expone en los endpoints `/api/webhooks/*`, protegidos con `N8N_API_KEY`, y nunca en `/api/subscriptions`.
+- **Job de recordatorios:** `GET /api/cron/reminders` valida `Authorization: Bearer <CRON_SECRET>` con `crypto.timingSafeEqual` y devuelve 401 si no coincide. Los usuarios sin `email` se omiten.
+- **Lógica pura en `lib/reminders.ts`** (con tests): qué suscripciones avisar (`status = active`, hoy >= `nextBillingDate - reminderDays`, y `lastNotifiedFor` distinto del `nextBillingDate` actual), qué fechas avanzar y cómo agrupar los emails por usuario.
+- **Idempotencia:** `lastNotifiedFor` guarda el `nextBillingDate` ya notificado; se actualiza solo tras enviar el email con éxito, así una ejecución repetida o cortada no duplica avisos. El rollover usa `getNextBillingDate` de `lib/billing.ts`.
+- **Proxy:** `/api/cron/*` se excluye del 401 de Clerk en `proxy.ts` (se autentica con `CRON_SECRET`, no con sesión). Sustituye a la exclusión actual de `/api/webhooks/*`; actualizar `__tests__/route-access.test.ts`.
+- **Variables de entorno nuevas:** `CRON_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`. Se retira `N8N_API_KEY`.
+- **Privacidad:** el email es dato personal; solo se usa dentro del job en el servidor. Ninguna respuesta HTTP lo devuelve, ni `/api/subscriptions` ni el propio endpoint de cron (responde solo con contadores).
 - **Al implementarlo:** modificar `prisma/schema.prisma`, crear la migración y actualizar el bloque de arriba en el mismo commit.
 
 ## 4. API de suscripciones (Fase 2)
