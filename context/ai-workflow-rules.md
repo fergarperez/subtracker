@@ -16,7 +16,7 @@ Estas reglas son de obligado cumplimiento para cualquier asistente de IA que gen
 
 - **Alcance estricto:** Implementar **únicamente** la funcionalidad solicitada en el prompt actual. No introducir librerías ni refactors fuera de alcance.
 - **Vertical Slicing:** Entregar cada funcionalidad completa (esquema DB -> validación Zod -> Route Handler `/api/*` -> tests -> UI) antes de avanzar.
-- **Sin Server Actions:** Toda mutación o consulta desde cliente debe pasar exclusivamente por los Route Handlers en `src/app/api/**`.
+- **Sin Server Actions:** Toda mutación o consulta desde cliente debe pasar exclusivamente por los Route Handlers en `app/api/**`.
 
 ## 3. Estándares de Seguridad (Obligatorios)
 

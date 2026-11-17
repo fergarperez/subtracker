@@ -3,13 +3,14 @@
 ## 1. Core Stack
 
 - **Framework:** Next.js (App Router) con TypeScript estricto.
-- **API Layer:** Next.js Route Handlers (`src/app/api/**`) — **NO se usan Server Actions**.
+- **API Layer:** Next.js Route Handlers (`app/api/**`) — **NO se usan Server Actions**.
 - **Authentication:** Clerk (`@clerk/nextjs`).
 - **Database:** NeonDB (PostgreSQL Serverless).
-- **ORM:** Prisma ORM con driver serverless de Neon (`@prisma/adapter-neon` / `@neondatabase/serverless`).
+- **ORM:** Prisma ORM 7 (cliente generado en `generated/prisma`, ignorado en git; `postinstall` ejecuta `prisma generate`) con driver serverless de Neon (`@prisma/adapter-neon` / `@neondatabase/serverless`).
 - **Validation:** Zod.
 - **Styling:** Tailwind CSS + `shadcn/ui`.
-- **Testing:** Vitest (unit & API integration tests) + Testing Library / Playwright (E2E básico).
+- **Estructura:** `app/` en la raíz (sin `src/`); alias `@/*` → raíz. En Next 16 `middleware` se llama `proxy.ts`.
+- **Testing:** Vitest (`npm run test`, tests en `__tests__/`) (unit & API integration tests) + Testing Library / Playwright (E2E básico).
 
 ## 2. Infrastructure & Deployment
 
