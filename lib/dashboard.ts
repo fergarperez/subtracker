@@ -115,3 +115,41 @@ export const STATUS_LABELS: Record<SubscriptionStatus, string> = {
   paused: "Pausada",
   cancelled: "Cancelada",
 };
+
+export type CategoryShare = { category: string; monthly: number; share: number };
+
+/** Gasto mensual por categoría en una divisa (solo activas), de mayor a menor. */
+export function categoryBreakdown(subs: Subscription[], currency: string): CategoryShare[] {
+  const map = new Map<string, number>();
+  for (const s of subs) {
+    if (s.status !== "active" || s.currency !== currency) continue;
+    map.set(s.category, (map.get(s.category) ?? 0) + toMonthly(s.price, s.billingCycle));
+  }
+  const total = [...map.values()].reduce((a, b) => a + b, 0);
+  if (total === 0) return [];
+  return [...map.entries()]
+    .map(([category, monthly]) => ({ category, monthly: round2(monthly), share: monthly / total }))
+    .sort((a, b) => b.monthly - a.monthly);
+}
+
+/** Posición (0–1) de una fecha dentro de la ventana [now, now + days]. */
+export function timelinePosition(iso: string, now: Date, days: number): number {
+  const p = (Date.parse(iso) - now.getTime()) / (days * DAY);
+  return Math.min(1, Math.max(0, p));
+}
+
+/** Tono estable (0–359) a partir de un texto, para avatares y categorías. */
+export function hueFromText(text: string): number {
+  let h = 0;
+  for (const ch of text.toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) % 360;
+  return h;
+}
+
+/** Fila (0 o 1) de cada marcador: si queda muy cerca del anterior, sube a la otra fila. */
+export function markerRows(positions: number[], minGap = 0.08): number[] {
+  const rows: number[] = [];
+  positions.forEach((pos, i) => {
+    rows.push(i > 0 && pos - positions[i - 1] < minGap ? 1 - rows[i - 1] : 0);
+  });
+  return rows;
+}

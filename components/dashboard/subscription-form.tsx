@@ -9,7 +9,7 @@ import { SUBSCRIPTION_STATUSES } from "@/lib/validations/subscription";
 import type { SubscriptionPayload } from "@/lib/api-client";
 
 const field =
-  "h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+  "h-10 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 type Props = {
   open: boolean;
@@ -158,7 +158,7 @@ function SubscriptionForm({
         />
       </Label>
       {error && (
-        <p role="alert" className="text-sm text-red-500">
+        <p role="alert" className="text-sm text-urgent">
           {error}
         </p>
       )}
@@ -177,7 +177,7 @@ function SubscriptionForm({
 function Label({ text, children }: { text: string; children: React.ReactNode }) {
   return (
     <label className="grid gap-1.5 text-sm">
-      <span className="text-muted-foreground">{text}</span>
+      <span className="font-medium">{text}</span>
       {children}
     </label>
   );
