@@ -29,6 +29,7 @@ model UserSettings {
   userId              String   @id // Clerk userId
   defaultCurrency     String   @default("EUR")
   defaultReminderDays Int      @default(3)
+  email               String?  // Email de aviso (sincronizado desde Clerk)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -55,7 +56,7 @@ model Subscription {
 }
 ```
 
-### Cambio planificado (Fase 4): email de aviso
+### Email de aviso (Fase 4, implementado)
 
 Los avisos son para **todos los usuarios**, por **email**, enviados por el cron de Vercel con Resend. Decisión: el email se guarda en `UserSettings` (no se consulta a Clerk en cada ejecución).
 
@@ -73,7 +74,7 @@ model UserSettings {
 - **Proxy:** `/api/cron/*` se excluye del 401 de Clerk en `proxy.ts` (se autentica con `CRON_SECRET`, no con sesión). Sustituye a la exclusión actual de `/api/webhooks/*`; actualizar `__tests__/route-access.test.ts`.
 - **Variables de entorno nuevas:** `CRON_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`. Se retira `N8N_API_KEY`.
 - **Privacidad:** el email es dato personal; solo se usa dentro del job en el servidor. Ninguna respuesta HTTP lo devuelve, ni `/api/subscriptions` ni el propio endpoint de cron (responde solo con contadores).
-- **Al implementarlo:** modificar `prisma/schema.prisma`, crear la migración y actualizar el bloque de arriba en el mismo commit.
+- **Implementación:** `lib/user-settings.ts` (sync del email), `lib/reminders.ts`, `lib/cron-auth.ts`, `lib/email.ts` (Resend `POST /emails/batch` por `fetch`), `app/api/cron/reminders/route.ts` y `vercel.json` (`0 7 * * *`). Orden del job: rollover → envío → marcar `lastNotifiedFor` solo si el envío fue correcto.
 
 ## 4. API de suscripciones (Fase 2)
 

@@ -12,6 +12,8 @@ const db = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/prisma", () => ({ prisma: { subscription: db } }));
 
+vi.mock("@/lib/user-settings", () => ({ syncUserEmail: vi.fn() }));
+
 import { GET, POST } from "@/app/api/subscriptions/route";
 import { DELETE, GET as GET_ONE, PATCH } from "@/app/api/subscriptions/[id]/route";
 import { NextRequest } from "next/server";

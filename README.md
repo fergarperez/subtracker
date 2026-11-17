@@ -34,3 +34,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Avisos por email (Vercel Cron + Resend)
+
+Un cron diario de Vercel (`vercel.json`, `0 7 * * *` UTC) llama a `GET /api/cron/reminders`, que avanza los cobros pasados y envía por Resend un email a cada usuario con cobros próximos.
+
+Variables necesarias: `CRON_SECRET` (Vercel la envía como `Authorization: Bearer`), `RESEND_API_KEY` y `EMAIL_FROM`. Prueba local:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/reminders
+```
