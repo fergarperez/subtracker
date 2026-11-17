@@ -10,7 +10,7 @@
 
 - [x] Definición de arquitectura (Next.js API + Clerk + NeonDB + Vercel + n8n).
 - [x] Inicializar proyecto Next.js (App Router, TypeScript, Tailwind, shadcn/ui). Se mantiene `app/` en la raíz (sin `src/`).
-- [x] Configurar Prisma con NeonDB y crear esquema inicial (`UserSettings`, `Subscription`). Pendiente: aplicar la primera migración cuando exista `DATABASE_URL` real de Neon.
+- [x] Configurar Prisma con NeonDB y crear esquema inicial (`UserSettings`, `Subscription`). Migración inicial aplicada en Neon (dev).
 - [x] Configurar **Vitest** para testing unitario y de endpoints API (`npm run test`).
 - [x] Configurar cabeceras de seguridad HTTP en `next.config.ts` y `.env.example`.
 
@@ -69,13 +69,14 @@
 - Tests Fase 2: `billing.test.ts`, `subscription-validation.test.ts`, `subscriptions-api.test.ts` (401, 400, 404 cruzado, userId de sesión). Total: 48 tests.
 - Fase 3: `lib/dashboard.ts` (totales por divisa, próximos cobros, urgencia, filtros/orden, formato), `lib/api-client.ts` (fetch tipado), `components/dashboard/*` (KPIs, próximos vencimientos 7/15/30 días, listado filtrable/ordenable con pausar/editar/eliminar, modal crear/editar), `components/ui/dialog.tsx` (base-ui). Dependencia añadida: `swr`. Tests: `dashboard.test.ts` (9). Total: 57 tests.
 - Fase 3.5: landing en `app/page.tsx` (navbar, hero, vista previa, 3 feature cards, footer) + `components/landing/product-preview.tsx`. La vista previa es una maqueta estática con datos de ejemplo, no capturas reales. Footer: "Hecho por Fernando" (ajustar el crédito si procede).
+- Base de datos: `prisma/migrations/20261117014434_init` creada y aplicada en Neon; tablas `UserSettings` y `Subscription` verificadas con una consulta real.
 - Repo: `master` renombrada a `main`; creada `dev`; publicado en GitHub (`fergarperez/subtracker`). PR #1 (Fase 0), #2 (des-trackeo del cliente Prisma generado) y #3 (contexto de producto) fusionadas.
 
 ## 4. Known Issues / Technical Debt
 
 - Dashboard: el botón `+ Nueva suscripción` está en la cabecera de la página, no en el header del layout. Los KPIs se muestran por divisa (sin conversión entre divisas). Falta el desglose de gasto por categoría (overview). Sin tests de componentes (solo lógica pura).
 - **Decidido, pendiente de implementar (Fase 4):** los avisos de n8n son para todos los usuarios, por email. Se añadirá `email String?` a `UserSettings` (sincronizado desde Clerk). Detalle en `architecture-context.md` §3.
-- Falta aplicar la migración inicial en Neon (`npx prisma migrate dev`) con una `DATABASE_URL` real.
+- Migración inicial (`20261117014434_init`) aplicada en el Neon de desarrollo. En producción (Fase 5) se aplica con `npx prisma migrate deploy`, no `migrate dev`.
 - La CSP incluye dominios de Clerk de desarrollo (`*.clerk.accounts.dev`, `*.clerk.com`); al pasar a instancia de producción con dominio propio (`clerk.<tu-dominio>`) habrá que añadirlo (Fase 5).
 - `ClerkProvider` va dentro de `<Suspense>` en `app/layout.tsx` por `cacheComponents`.
 - Rate limiting de webhooks pendiente (Fase 4).
