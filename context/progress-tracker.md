@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
-**Current Phase:** Phase 3.5 (landing) implementada en `feat/landing`, pendiente de PR a `dev`
-**Active Branch:** `feat/landing` (flujo: `feat/*` → `dev` → `main`)
+**Current Phase:** Phase 3.5 (landing) en `feat/landing-public-for-all`, pendiente de PR a `dev`
+**Active Branch:** `feat/landing-public-for-all` (flujo: `feat/*` → `dev` → `main`)
 **Last Updated:** 2026-11-17
 
 ## 1. Roadmap & Milestones
@@ -37,7 +37,7 @@
 ### Phase 3.5: Landing pública (después de la Fase 3)
 
 - [x] Diseñar y construir la landing en `/` en español, según `ui-context.md` §4, con capturas del dashboard real.
-- [x] Redirigir `/` al dashboard cuando hay sesión activa (hecho en Phase 1).
+- [x] ~~Redirigir `/` al dashboard con sesión activa~~ (Phase 1) — **revertido**: la landing es visible con sesión y el navbar muestra `Ir al dashboard`.
 
 ### Phase 4: n8n Reminders API & Workflow Export
 

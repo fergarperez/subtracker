@@ -30,12 +30,12 @@ Aplicación web open-source y gratuita para el seguimiento centralizado de suscr
   - Devuelve las suscripciones activas próximas a vencer que aún no han sido notificadas en el ciclo actual, y expone un endpoint de confirmación (`ack`) y avance automático de fechas (`rollover`).
   - Canal: **email**. El email de cada usuario se guarda en `UserSettings` (ver `architecture-context.md` §3).
 - **Landing Page Pública (`/`):**
-  - **Redirección automática:** Si el usuario ya tiene sesión iniciada en Clerk, `/` redirige inmediatamente a `/dashboard`.
-  - **Visitantes no autenticados:** Página de presentación minimalista con propuesta de valor clara, vista previa visual (mockup estático o interactivo con datos de ejemplo) del dashboard y CTAs hacia `/sign-up` ("Empezar gratis"). Orientada a usuarios finales: no menciona open source, GitHub ni n8n (detalle en `ui-context.md` §4).
+  - **Sin redirección:** la landing es visible también con sesión iniciada; en ese caso el navbar muestra `Ir al dashboard` en lugar de los botones de acceso.
+  - **Contenido:** Página de presentación minimalista con propuesta de valor clara, vista previa visual (mockup estático o interactivo con datos de ejemplo) del dashboard y CTAs hacia `/sign-up` ("Empezar gratis"). Orientada a usuarios finales: no menciona open source, GitHub ni n8n (detalle en `ui-context.md` §4).
 
 ## 5. User Flow Principal
 
-1. **Acceso:** El visitante llega a la landing (`/`), se registra o inicia sesión con Clerk y entra a su dashboard privado. Con sesión activa, `/` redirige al dashboard.
+1. **Acceso:** El visitante llega a la landing (`/`), se registra o inicia sesión con Clerk y entra a su dashboard privado. Con sesión activa, la landing sigue visible y ofrece un acceso directo al dashboard.
 2. **Alta de suscripción:** El usuario registra una suscripción desde el cliente web (`POST /api/subscriptions`).
 3. **Consulta:** El dashboard consume `GET /api/subscriptions` y renderiza el gasto mensual normalizado y los vencimientos inminentes.
 4. **Alerta automatizada (n8n):** Cada día a las 09:00, el workflow en tu VPS con n8n hace `GET /api/webhooks/reminders` a Vercel. Si detecta un cobro próximo, envía un email al usuario dueño de la suscripción y confirma el envío con `POST /api/webhooks/reminders/ack`.
